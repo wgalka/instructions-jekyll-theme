@@ -33,44 +33,44 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --theme-background: #0d1117;
-  --theme-surface: #161b22;
-  --theme-surface-raised: #0d1117;
-  --theme-text: #e6edf3;
-  --theme-muted: #8b949e;
-  --theme-border: #30363d;
-  --theme-link: #58a6ff;
-  --theme-code: #30363d;
+  --theme-background: #000000;
+  --theme-surface: #111111;
+  --theme-surface-raised: #080808;
+  --theme-text: #b8b8b8;
+  --theme-muted: #858585;
+  --theme-border: #292929;
+  --theme-link: #8ab4f8;
+  --theme-code: #1d1d1d;
 
   // Primer color tokens cover controls and components using its native palette.
-  --color-fg-default: #e6edf3;
-  --color-fg-muted: #8b949e;
-  --color-fg-subtle: #6e7681;
-  --color-canvas-default: #0d1117;
-  --color-canvas-overlay: #161b22;
-  --color-canvas-inset: #010409;
-  --color-canvas-subtle: #161b22;
-  --color-border-default: #30363d;
-  --color-border-muted: #21262d;
-  --color-accent-fg: #58a6ff;
-  --color-accent-emphasis: #1f6feb;
-  --color-neutral-muted: rgba(110, 118, 129, 0.4);
-  --color-neutral-subtle: rgba(110, 118, 129, 0.1);
+  --color-fg-default: #b8b8b8;
+  --color-fg-muted: #858585;
+  --color-fg-subtle: #6f6f6f;
+  --color-canvas-default: #000000;
+  --color-canvas-overlay: #111111;
+  --color-canvas-inset: #000000;
+  --color-canvas-subtle: #111111;
+  --color-border-default: #292929;
+  --color-border-muted: #1d1d1d;
+  --color-accent-fg: #8ab4f8;
+  --color-accent-emphasis: #5b91e8;
+  --color-neutral-muted: rgba(133, 133, 133, 0.4);
+  --color-neutral-subtle: rgba(133, 133, 133, 0.1);
 
   // Older Primer releases expose the same palette under these names.
-  --color-text-primary: #e6edf3;
-  --color-text-secondary: #8b949e;
-  --color-bg-primary: #0d1117;
-  --color-bg-secondary: #161b22;
-  --color-bg-tertiary: #21262d;
-  --color-border-primary: #30363d;
-  --color-border-secondary: #21262d;
-  --color-auto-gray-1: #6e7681;
-  --color-auto-gray-2: #484f58;
-  --color-auto-gray-3: #30363d;
-  --color-auto-gray-4: #21262d;
-  --color-auto-gray-5: #161b22;
-  --color-auto-gray-6: #0d1117;
+  --color-text-primary: #b8b8b8;
+  --color-text-secondary: #858585;
+  --color-bg-primary: #000000;
+  --color-bg-secondary: #111111;
+  --color-bg-tertiary: #1d1d1d;
+  --color-border-primary: #292929;
+  --color-border-secondary: #1d1d1d;
+  --color-auto-gray-1: #777777;
+  --color-auto-gray-2: #555555;
+  --color-auto-gray-3: #3a3a3a;
+  --color-auto-gray-4: #292929;
+  --color-auto-gray-5: #111111;
+  --color-auto-gray-6: #000000;
 }
 
 body {
@@ -176,7 +176,7 @@ body {
 }
 
 :root[data-theme="dark"] .markdown-body a:hover {
-  color: #79c0ff;
+  color: #a9caff;
 }
 
 :root[data-theme="dark"] .markdown-body blockquote {
@@ -221,7 +221,7 @@ body {
 :root[data-theme="dark"] .markdown-body .highlight .cm,
 :root[data-theme="dark"] .markdown-body .highlight .c1,
 :root[data-theme="dark"] .markdown-body .highlight .cs {
-  color: #8b949e;
+  color: #858585;
 }
 
 :root[data-theme="dark"] .markdown-body .highlight .k,
