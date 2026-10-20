@@ -12,20 +12,29 @@
       code.parentElement.replaceWith(diagram);
     });
 
+    let mermaidRenderQueue = Promise.resolve();
+
     function renderMermaid(theme) {
-      const diagrams = document.querySelectorAll("pre.mermaid");
-      if (diagrams.length === 0) return;
+      mermaidRenderQueue = mermaidRenderQueue.catch(function () {}).then(function () {
+        const diagrams = document.querySelectorAll("pre.mermaid");
+        if (diagrams.length === 0) return;
 
-      diagrams.forEach(function (diagram) {
-        if (diagram.dataset.source) diagram.textContent = diagram.dataset.source;
+        diagrams.forEach(function (diagram) {
+          diagram.removeAttribute("data-processed");
+          if (diagram.dataset.source) diagram.textContent = diagram.dataset.source;
+        });
+
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: "strict",
+          theme: theme === "dark" ? "dark" : "default",
+        });
+        return mermaid.run({ nodes: diagrams });
+      }).catch(function (error) {
+        console.error("Nie udało się wyrenderować diagramu Mermaid.", error);
       });
 
-      mermaid.initialize({
-        startOnLoad: false,
-        securityLevel: "strict",
-        theme: theme === "dark" ? "dark" : "default",
-      });
-      mermaid.run({ querySelector: "pre.mermaid" });
+      return mermaidRenderQueue;
     }
 
     renderMermaid(document.documentElement.dataset.theme);
