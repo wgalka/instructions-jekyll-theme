@@ -1,9 +1,24 @@
 (function () {
   "use strict";
 
-  const oneLetterWordPattern = /(?<![\p{L}\p{N}_])([aiouwz])(\s+)(?=\S)/giu;
+  const shortPolishWords = [
+    "a", "i", "o", "u", "w", "z",
+    "aż", "bo", "by", "ci", "co", "do", "go", "im", "ja", "je",
+    "ją", "ku", "ma", "mi", "my", "na", "ni", "no", "od", "on",
+    "po", "są", "ta", "te", "to", "tu", "tę", "ty", "we", "wy",
+    "za", "ze", "że",
+  ];
+  const shortPolishWordAlternation = shortPolishWords
+    .sort(function (left, right) {
+      return right.length - left.length;
+    })
+    .join("|");
+  const shortPolishWordPattern = new RegExp(
+    "(?<![\\p{L}\\p{N}_])(" + shortPolishWordAlternation + ")(\\s+)(?=\\S)",
+    "giu"
+  );
 
-  function joinOneLetterWords(textNodes) {
+  function joinShortPolishWords(textNodes) {
     let text = "";
     const positions = [];
 
@@ -14,7 +29,7 @@
       }
     });
 
-    const matches = Array.from(text.matchAll(oneLetterWordPattern));
+    const matches = Array.from(text.matchAll(shortPolishWordPattern));
 
     matches.reverse().forEach(function (match) {
       const whitespaceStart = match.index + match[1].length;
@@ -35,12 +50,12 @@
     });
   }
 
-  function preventPolishWidows(paragraph) {
+  function preventPolishOrphans(paragraph) {
     let textNodes = [];
 
     function processTextNodes() {
       if (textNodes.length > 0) {
-        joinOneLetterWords(textNodes);
+        joinShortPolishWords(textNodes);
         textNodes = [];
       }
     }
@@ -58,7 +73,13 @@
         return;
       }
 
+      const isNestedBlock =
+        node !== paragraph &&
+        node.matches("p, ul, ol, li, table, blockquote, div, h1, h2, h3, h4, h5, h6");
+
+      if (isNestedBlock) processTextNodes();
       node.childNodes.forEach(visit);
+      if (isNestedBlock) processTextNodes();
     }
 
     visit(paragraph);
@@ -67,7 +88,12 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     document
-      .querySelectorAll(".markdown-body > p, .markdown-body li > p, .markdown-body blockquote > p")
-      .forEach(preventPolishWidows);
+      .querySelectorAll(
+        ".markdown-body p, .markdown-body li, .markdown-body h1, .markdown-body h2, " +
+          ".markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6, " +
+          ".markdown-body th, .markdown-body td, .markdown-body dt, .markdown-body dd, " +
+          ".markdown-body figcaption"
+      )
+      .forEach(preventPolishOrphans);
   });
 })();
