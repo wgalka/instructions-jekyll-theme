@@ -17,8 +17,12 @@
     "(?<![\\p{L}\\p{N}_])(" + shortPolishWordAlternation + ")(\\s+)(?=\\S)",
     "giu"
   );
+  const shortPolishWordBeforeInlineTokenPattern = new RegExp(
+    "(?<![\\p{L}\\p{N}_])(" + shortPolishWordAlternation + ")(\\s+)$",
+    "iu"
+  );
 
-  function joinShortPolishWords(textNodes) {
+  function joinShortPolishWords(textNodes, followedByInlineToken) {
     let text = "";
     const positions = [];
 
@@ -31,6 +35,14 @@
 
     const matches = Array.from(text.matchAll(shortPolishWordPattern));
 
+    if (followedByInlineToken) {
+      const trailingMatch = text.match(shortPolishWordBeforeInlineTokenPattern);
+      if (trailingMatch) matches.push(trailingMatch);
+    }
+
+    matches.sort(function (left, right) {
+      return left.index - right.index;
+    });
     matches.reverse().forEach(function (match) {
       const whitespaceStart = match.index + match[1].length;
       const whitespaceEnd = whitespaceStart + match[2].length;
@@ -53,9 +65,9 @@
   function preventPolishOrphans(paragraph) {
     let textNodes = [];
 
-    function processTextNodes() {
+    function processTextNodes(followedByInlineToken) {
       if (textNodes.length > 0) {
-        joinShortPolishWords(textNodes);
+        joinShortPolishWords(textNodes, followedByInlineToken);
         textNodes = [];
       }
     }
@@ -68,8 +80,13 @@
 
       if (node.nodeType !== Node.ELEMENT_NODE) return;
 
-      if (node.matches("code, pre, kbd, samp, script, style, br")) {
+      if (node.matches("pre, script, style, br")) {
         processTextNodes();
+        return;
+      }
+
+      if (node.matches("code, kbd, samp")) {
+        processTextNodes(true);
         return;
       }
 
