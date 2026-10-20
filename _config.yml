@@ -1,0 +1,17 @@
+title: PAWOoM
+description: Instrukcje laboratoryjne
+lang: pl-PL
+
+remote_theme: pages-themes/primer@v0.6.0
+
+plugins:
+  - jekyll-remote-theme
+
+markdown: kramdown
+kramdown:
+  input: GFM
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
