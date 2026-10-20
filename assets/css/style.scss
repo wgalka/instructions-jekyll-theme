@@ -11,3 +11,10 @@
   -webkit-hyphens: auto;
   text-wrap: pretty;
 }
+
+.markdown-body code {
+  hyphens: none;
+  -webkit-hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
