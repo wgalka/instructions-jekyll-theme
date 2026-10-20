@@ -2,3 +2,12 @@
 ---
 
 @import "jekyll-theme-primer";
+
+.markdown-body > p,
+.markdown-body li > p,
+.markdown-body blockquote > p {
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  text-wrap: pretty;
+}

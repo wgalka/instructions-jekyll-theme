@@ -18,7 +18,7 @@ Motyw Jekyll dla GitHub Pages, oparty na oryginalnym layoucie i stylach [Primer 
 
 GitHub Pages obsługuje `remote_theme` z repozytorium GitHub; plugin `jekyll-remote-theme` pobiera wskazaną wersję podczas budowania strony.
 
-`_layouts/default.html` zachowuje układ Primer, `assets/css/style.scss` importuje jego oryginalne style, a `_includes/head-custom.html` dodaje renderowanie bloków `mermaid`. `index.md` służy jako demonstracyjna instrukcja i wzór treści.
+`_layouts/default.html` zachowuje układ Primer, `assets/css/style.scss` importuje jego oryginalne style i justuje akapity z automatycznym dzieleniem wyrazów. Skrypt `assets/js/polish-typography.js` łączy polskie jednoliterowe spójniki i przyimki (`a`, `i`, `o`, `u`, `w`, `z`) z następnym wyrazem twardą spacją. `_includes/head-custom.html` dodaje też renderowanie bloków `mermaid`. `index.md` służy jako demonstracyjna instrukcja i wzór treści.
 
 ## Podgląd lokalny
 
