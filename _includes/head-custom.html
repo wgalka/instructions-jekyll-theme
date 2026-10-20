@@ -7,11 +7,30 @@
     document.querySelectorAll("pre > code.language-mermaid").forEach(function (code) {
       const diagram = document.createElement("pre");
       diagram.className = "mermaid";
-      diagram.textContent = code.textContent;
+      diagram.dataset.source = code.textContent;
+      diagram.textContent = diagram.dataset.source;
       code.parentElement.replaceWith(diagram);
     });
 
-    mermaid.initialize({ startOnLoad: false, securityLevel: "strict" });
-    mermaid.run({ querySelector: ".mermaid" });
+    function renderMermaid(theme) {
+      const diagrams = document.querySelectorAll("pre.mermaid");
+      if (diagrams.length === 0) return;
+
+      diagrams.forEach(function (diagram) {
+        if (diagram.dataset.source) diagram.textContent = diagram.dataset.source;
+      });
+
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "strict",
+        theme: theme === "dark" ? "dark" : "default",
+      });
+      mermaid.run({ querySelector: "pre.mermaid" });
+    }
+
+    renderMermaid(document.documentElement.dataset.theme);
+    document.addEventListener("themechange", function (event) {
+      renderMermaid(event.detail.theme);
+    });
   });
 </script>

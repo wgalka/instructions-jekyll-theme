@@ -18,3 +18,257 @@
   overflow-wrap: normal;
   word-break: normal;
 }
+
+:root {
+  color-scheme: light;
+  --theme-background: #ffffff;
+  --theme-surface: #f6f8fa;
+  --theme-surface-raised: #ffffff;
+  --theme-text: #24292f;
+  --theme-muted: #57606a;
+  --theme-border: #d0d7de;
+  --theme-link: #0969da;
+  --theme-code: #afb8c1;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --theme-background: #0d1117;
+  --theme-surface: #161b22;
+  --theme-surface-raised: #0d1117;
+  --theme-text: #e6edf3;
+  --theme-muted: #8b949e;
+  --theme-border: #30363d;
+  --theme-link: #58a6ff;
+  --theme-code: #30363d;
+
+  // Primer color tokens cover controls and components using its native palette.
+  --color-fg-default: #e6edf3;
+  --color-fg-muted: #8b949e;
+  --color-fg-subtle: #6e7681;
+  --color-canvas-default: #0d1117;
+  --color-canvas-overlay: #161b22;
+  --color-canvas-inset: #010409;
+  --color-canvas-subtle: #161b22;
+  --color-border-default: #30363d;
+  --color-border-muted: #21262d;
+  --color-accent-fg: #58a6ff;
+  --color-accent-emphasis: #1f6feb;
+  --color-neutral-muted: rgba(110, 118, 129, 0.4);
+  --color-neutral-subtle: rgba(110, 118, 129, 0.1);
+
+  // Older Primer releases expose the same palette under these names.
+  --color-text-primary: #e6edf3;
+  --color-text-secondary: #8b949e;
+  --color-bg-primary: #0d1117;
+  --color-bg-secondary: #161b22;
+  --color-bg-tertiary: #21262d;
+  --color-border-primary: #30363d;
+  --color-border-secondary: #21262d;
+  --color-auto-gray-1: #6e7681;
+  --color-auto-gray-2: #484f58;
+  --color-auto-gray-3: #30363d;
+  --color-auto-gray-4: #21262d;
+  --color-auto-gray-5: #161b22;
+  --color-auto-gray-6: #0d1117;
+}
+
+body {
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.markdown-body {
+  color: var(--theme-text);
+}
+
+.theme-toggle {
+  position: fixed;
+  z-index: 1000;
+  top: 1rem;
+  right: 1rem;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  padding: 0;
+  color: var(--theme-text);
+  background: var(--theme-surface-raised);
+  border: 1px solid var(--theme-border);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgb(31 35 40 / 12%);
+  cursor: pointer;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.theme-toggle:hover {
+  transform: rotate(-12deg);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid var(--theme-link);
+  outline-offset: 3px;
+}
+
+.theme-toggle__icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.theme-toggle__icon--sun {
+  display: none;
+}
+
+.theme-toggle__icon--moon {
+  display: block;
+}
+
+:root[data-theme="dark"] .theme-toggle__icon--sun {
+  display: block;
+}
+
+:root[data-theme="dark"] .theme-toggle__icon--moon {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .theme-toggle {
+    top: 0.65rem;
+    right: 0.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .theme-toggle {
+    transition: none;
+  }
+}
+
+:root[data-theme="dark"] body {
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+}
+
+:root[data-theme="dark"] .markdown-body {
+  color: var(--theme-text);
+}
+
+:root[data-theme="dark"] .markdown-body h1,
+:root[data-theme="dark"] .markdown-body h2,
+:root[data-theme="dark"] .markdown-body h3,
+:root[data-theme="dark"] .markdown-body h4,
+:root[data-theme="dark"] .markdown-body h5,
+:root[data-theme="dark"] .markdown-body h6 {
+  color: var(--theme-text);
+  border-bottom-color: var(--theme-border);
+}
+
+:root[data-theme="dark"] .markdown-body a {
+  color: var(--theme-link);
+}
+
+:root[data-theme="dark"] .markdown-body a:hover {
+  color: #79c0ff;
+}
+
+:root[data-theme="dark"] .markdown-body blockquote {
+  color: var(--theme-muted);
+  border-left-color: var(--theme-border);
+}
+
+:root[data-theme="dark"] .markdown-body hr,
+:root[data-theme="dark"] .markdown-body table tr {
+  border-color: var(--theme-border);
+}
+
+:root[data-theme="dark"] .markdown-body table tr {
+  background-color: var(--theme-background);
+}
+
+:root[data-theme="dark"] .markdown-body table tr:nth-child(2n) {
+  background-color: var(--theme-surface);
+}
+
+:root[data-theme="dark"] .markdown-body th,
+:root[data-theme="dark"] .markdown-body td {
+  border-color: var(--theme-border);
+}
+
+:root[data-theme="dark"] .markdown-body pre,
+:root[data-theme="dark"] .markdown-body code,
+:root[data-theme="dark"] .markdown-body tt,
+:root[data-theme="dark"] .markdown-body kbd,
+:root[data-theme="dark"] .markdown-body .highlight,
+:root[data-theme="dark"] .markdown-body .highlight pre {
+  color: var(--theme-text);
+  background-color: var(--theme-surface);
+}
+
+:root[data-theme="dark"] .markdown-body kbd {
+  border-color: var(--theme-border);
+  box-shadow: inset 0 -1px 0 var(--theme-border);
+}
+
+:root[data-theme="dark"] .markdown-body .highlight .c,
+:root[data-theme="dark"] .markdown-body .highlight .cm,
+:root[data-theme="dark"] .markdown-body .highlight .c1,
+:root[data-theme="dark"] .markdown-body .highlight .cs {
+  color: #8b949e;
+}
+
+:root[data-theme="dark"] .markdown-body .highlight .k,
+:root[data-theme="dark"] .markdown-body .highlight .kc,
+:root[data-theme="dark"] .markdown-body .highlight .kd,
+:root[data-theme="dark"] .markdown-body .highlight .kn,
+:root[data-theme="dark"] .markdown-body .highlight .kp,
+:root[data-theme="dark"] .markdown-body .highlight .kr,
+:root[data-theme="dark"] .markdown-body .highlight .kt {
+  color: #ff7b72;
+}
+
+:root[data-theme="dark"] .markdown-body .highlight .s,
+:root[data-theme="dark"] .markdown-body .highlight .sa,
+:root[data-theme="dark"] .markdown-body .highlight .sb,
+:root[data-theme="dark"] .markdown-body .highlight .sc,
+:root[data-theme="dark"] .markdown-body .highlight .dl,
+:root[data-theme="dark"] .markdown-body .highlight .s1,
+:root[data-theme="dark"] .markdown-body .highlight .s2 {
+  color: #a5d6ff;
+}
+
+:root[data-theme="dark"] .markdown-body .highlight .m,
+:root[data-theme="dark"] .markdown-body .highlight .mi,
+:root[data-theme="dark"] .markdown-body .highlight .mf {
+  color: #79c0ff;
+}
+
+:root[data-theme="dark"] .markdown-body .highlight .nf,
+:root[data-theme="dark"] .markdown-body .highlight .nc {
+  color: #d2a8ff;
+}
+
+:root[data-theme="dark"] .markdown-body .highlight .na,
+:root[data-theme="dark"] .markdown-body .highlight .nt {
+  color: #7ee787;
+}
+
+:root[data-theme="dark"] .markdown-body input,
+:root[data-theme="dark"] .markdown-body select,
+:root[data-theme="dark"] .markdown-body textarea {
+  color: var(--theme-text);
+  background-color: var(--theme-surface);
+  border-color: var(--theme-border);
+}
+
+:root[data-theme="dark"] .footer {
+  color: var(--theme-muted);
+  border-top-color: var(--theme-border);
+}
