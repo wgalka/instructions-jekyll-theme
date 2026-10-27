@@ -5,36 +5,52 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% seo %}
-    <script src="{{ '/assets/js/theme-toggle.js?v=2' | relative_url }}"></script>
-    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=4" | relative_url }}">
+    <script src="{{ '/assets/js/theme-toggle.js?v=3' | relative_url }}"></script>
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=5" | relative_url }}">
     {% include head-custom.html %}
   </head>
   <body>
-    <div class="reading-controls" role="region" aria-label="Ustawienia wyświetlania">
-      <div class="width-toggle-group" role="group" aria-label="Szerokość tekstu (znaki w linii)">
-        <span class="width-toggle-group__label" aria-hidden="true" title="Maksymalna liczba znaków w linii">Szer.</span>
-        <button class="width-toggle" type="button" data-line-width-option="45" aria-pressed="false" title="45 znaków w linii">45</button>
-        <button class="width-toggle" type="button" data-line-width-option="55" aria-pressed="true" title="55 znaków w linii">55</button>
-        <button class="width-toggle" type="button" data-line-width-option="65" aria-pressed="false" title="65 znaków w linii">65</button>
-        <button class="width-toggle" type="button" data-line-width-option="80" aria-pressed="false" title="80 znaków w linii">80</button>
-        <button class="width-toggle" type="button" data-line-width-option="100" aria-pressed="false" title="100 znaków w linii">100</button>
-      </div>
+    <div class="reading-controls" id="reading-controls" role="region" aria-label="Ustawienia wyświetlania">
       <button
-        class="theme-toggle"
-        id="theme-toggle"
+        class="reading-controls__trigger"
+        id="reading-controls-trigger"
         type="button"
-        aria-label="Ciemny motyw"
-        title="Przełącz na ciemny motyw"
-        aria-pressed="false"
+        aria-label="Ustawienia wyświetlania"
+        title="Ustawienia wyświetlania"
+        aria-expanded="false"
       >
-        <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <circle cx="12" cy="12" r="4"></circle>
-          <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
-        </svg>
-        <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M20.2 15.5A8.5 8.5 0 0 1 8.5 3.8 8.5 8.5 0 1 0 20.2 15.5Z"></path>
+        <svg class="reading-controls__gear" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
         </svg>
       </button>
+      <div class="reading-controls__panel">
+        <div class="width-toggle-group" role="group" aria-label="Szerokość tekstu (znaki w linii)">
+          <span class="width-toggle-group__label" aria-hidden="true" title="Maksymalna liczba znaków w linii">Szer.</span>
+          <button class="width-toggle" type="button" data-line-width-option="45" aria-pressed="false" title="45 znaków w linii">45</button>
+          <button class="width-toggle" type="button" data-line-width-option="55" aria-pressed="true" title="55 znaków w linii">55</button>
+          <button class="width-toggle" type="button" data-line-width-option="65" aria-pressed="false" title="65 znaków w linii">65</button>
+          <button class="width-toggle" type="button" data-line-width-option="80" aria-pressed="false" title="80 znaków w linii">80</button>
+          <button class="width-toggle" type="button" data-line-width-option="100" aria-pressed="false" title="100 znaków w linii">100</button>
+        </div>
+        <span class="reading-controls__divider" aria-hidden="true"></span>
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          type="button"
+          aria-label="Ciemny motyw"
+          title="Przełącz na ciemny motyw"
+          aria-pressed="false"
+        >
+          <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+          </svg>
+          <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M20.2 15.5A8.5 8.5 0 0 1 8.5 3.8 8.5 8.5 0 1 0 20.2 15.5Z"></path>
+          </svg>
+        </button>
+      </div>
     </div>
     <div class="container-lg px-3 my-5 markdown-body">
       {% if site.title and site.title != page.title %}

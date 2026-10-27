@@ -105,7 +105,11 @@
     function wrapMathTextNodes(root) {
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
         acceptNode: function (node) {
-          if (!node.nodeValue || (node.nodeValue.indexOf("$") === -1 && node.nodeValue.indexOf("\\") === -1)) {
+          if (
+            !node.nodeValue ||
+            (node.nodeValue.indexOf("$") === -1 &&
+              node.nodeValue.indexOf("\\") === -1)
+          ) {
             return NodeFilter.FILTER_REJECT;
           }
           const parent = node.parentElement;
@@ -246,8 +250,115 @@
         });
     }
 
+    function prepareResponsiveTables() {
+      document.querySelectorAll(".markdown-body table").forEach(function (table) {
+        if (table.closest(".table-wrapper")) return;
+        const wrapper = document.createElement("div");
+        wrapper.className = "table-wrapper";
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      });
+    }
+
+    function wrapCodeBlockLines(codeElement) {
+      if (
+        codeElement.dataset.wrappedLines === "true" ||
+        codeElement.closest(".mermaid-block")
+      ) {
+        return;
+      }
+
+      const lines = [];
+      const activeElementStack = [];
+
+      function startNewLine() {
+        const line = document.createElement("span");
+        line.className = "code-line";
+        lines.push(line);
+
+        let currentParent = line;
+        activeElementStack.forEach(function (templateNode) {
+          const clone = templateNode.cloneNode(false);
+          currentParent.appendChild(clone);
+          currentParent = clone;
+        });
+
+        return currentParent;
+      }
+
+      let currentInsertionTarget = startNewLine();
+
+      function walk(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const parts = node.nodeValue.split("\n");
+          for (let index = 0; index < parts.length; index += 1) {
+            if (index > 0) {
+              currentInsertionTarget = startNewLine();
+            }
+            if (parts[index].length > 0) {
+              currentInsertionTarget.appendChild(
+                document.createTextNode(parts[index])
+              );
+            }
+          }
+          return;
+        }
+
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const clone = node.cloneNode(false);
+          currentInsertionTarget.appendChild(clone);
+          activeElementStack.push(node);
+          const previousTarget = currentInsertionTarget;
+          currentInsertionTarget = clone;
+
+          node.childNodes.forEach(walk);
+
+          activeElementStack.pop();
+          // Restore target to the matching depth in the current line
+          let target = lines[lines.length - 1];
+          for (let depth = 0; depth < activeElementStack.length; depth += 1) {
+            target = target.lastElementChild || target;
+          }
+          currentInsertionTarget = target;
+          void previousTarget;
+        }
+      }
+
+      Array.from(codeElement.childNodes).forEach(walk);
+
+      if (
+        lines.length > 1 &&
+        lines[lines.length - 1].textContent.length === 0
+      ) {
+        lines.pop();
+      }
+
+      const fragment = document.createDocumentFragment();
+      lines.forEach(function (line, index) {
+        if (line.textContent.length === 0) {
+          line.appendChild(document.createTextNode("\u200b"));
+        }
+        fragment.appendChild(line);
+        if (index < lines.length - 1) {
+          fragment.appendChild(document.createTextNode("\n"));
+        }
+      });
+
+      codeElement.innerHTML = "";
+      codeElement.appendChild(fragment);
+      codeElement.dataset.wrappedLines = "true";
+    }
+
+    function prepareCodeBlocks() {
+      document
+        .querySelectorAll(".markdown-body pre > code")
+        .forEach(wrapCodeBlockLines);
+    }
+
     prepareMermaidBlocks();
     prepareMathBlocks();
+    prepareResponsiveTables();
+    prepareCodeBlocks();
 
     if (typeof window.applyPolishTypography === "function") {
       window.applyPolishTypography();

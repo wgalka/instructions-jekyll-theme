@@ -76,6 +76,34 @@
     updateThemeButton(document.documentElement.dataset.theme);
     updateWidthButtons(document.documentElement.dataset.lineWidth || defaultWidth);
 
+    const controls = document.getElementById("reading-controls");
+    const trigger = document.getElementById("reading-controls-trigger");
+
+    function setControlsOpen(isOpen) {
+      if (!controls || !trigger) return;
+      controls.classList.toggle("is-open", isOpen);
+      trigger.setAttribute("aria-expanded", String(isOpen));
+    }
+
+    if (controls && trigger) {
+      trigger.addEventListener("click", function (event) {
+        event.stopPropagation();
+        setControlsOpen(!controls.classList.contains("is-open"));
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!controls.contains(event.target)) {
+          setControlsOpen(false);
+        }
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          setControlsOpen(false);
+        }
+      });
+    }
+
     const toggle = document.getElementById("theme-toggle");
     if (toggle) {
       toggle.addEventListener("click", function () {
