@@ -1,19 +1,31 @@
 (function () {
   "use strict";
 
-  const storageKey = "instructions-theme";
+  const themeStorageKey = "instructions-theme";
+  const widthStorageKey = "instructions-line-width";
+  const allowedWidths = ["45", "55", "65", "80", "100"];
+  const defaultWidth = "55";
   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
 
   function readSavedTheme() {
     try {
-      const savedTheme = window.localStorage.getItem(storageKey);
+      const savedTheme = window.localStorage.getItem(themeStorageKey);
       return savedTheme === "light" || savedTheme === "dark" ? savedTheme : null;
     } catch (error) {
       return null;
     }
   }
 
-  function updateButton(theme) {
+  function readSavedWidth() {
+    try {
+      const savedWidth = window.localStorage.getItem(widthStorageKey);
+      return allowedWidths.indexOf(savedWidth) !== -1 ? savedWidth : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function updateThemeButton(theme) {
     const toggle = document.getElementById("theme-toggle");
     if (!toggle) return;
 
@@ -24,12 +36,33 @@
     toggle.setAttribute("aria-pressed", String(isDark));
   }
 
-  function applyTheme(theme) {
-    const isDark = theme === "dark";
-    document.documentElement.dataset.theme = isDark ? "dark" : "light";
-    updateButton(theme);
+  function updateWidthButtons(width) {
+    const buttons = document.querySelectorAll("[data-line-width-option]");
+    buttons.forEach(function (button) {
+      const isSelected = button.getAttribute("data-line-width-option") === width;
+      button.setAttribute("aria-pressed", String(isSelected));
+      button.classList.toggle("is-active", isSelected);
+    });
+  }
 
-    document.dispatchEvent(new CustomEvent("themechange", { detail: { theme: theme } }));
+  function applyTheme(theme) {
+    const normalizedTheme = theme === "dark" ? "dark" : "light";
+    document.documentElement.dataset.theme = normalizedTheme;
+    updateThemeButton(normalizedTheme);
+
+    document.dispatchEvent(
+      new CustomEvent("themechange", { detail: { theme: normalizedTheme } })
+    );
+  }
+
+  function applyWidth(width) {
+    const normalizedWidth = allowedWidths.indexOf(width) !== -1 ? width : defaultWidth;
+    document.documentElement.dataset.lineWidth = normalizedWidth;
+    updateWidthButtons(normalizedWidth);
+
+    document.dispatchEvent(
+      new CustomEvent("readingwidthchange", { detail: { width: normalizedWidth } })
+    );
   }
 
   function getSystemTheme() {
@@ -37,22 +70,41 @@
   }
 
   applyTheme(readSavedTheme() || getSystemTheme());
+  applyWidth(readSavedWidth() || defaultWidth);
 
   document.addEventListener("DOMContentLoaded", function () {
+    updateThemeButton(document.documentElement.dataset.theme);
+    updateWidthButtons(document.documentElement.dataset.lineWidth || defaultWidth);
+
     const toggle = document.getElementById("theme-toggle");
-    if (!toggle) return;
+    if (toggle) {
+      toggle.addEventListener("click", function () {
+        const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
 
-    updateButton(document.documentElement.dataset.theme);
-    toggle.addEventListener("click", function () {
-      const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        try {
+          window.localStorage.setItem(themeStorageKey, nextTheme);
+        } catch (error) {
+          // Keep the current selection for this page even when storage is unavailable.
+        }
 
-      try {
-        window.localStorage.setItem(storageKey, nextTheme);
-      } catch (error) {
-        // Keep the current selection for this page even when storage is unavailable.
-      }
+        applyTheme(nextTheme);
+      });
+    }
 
-      applyTheme(nextTheme);
+    const widthButtons = document.querySelectorAll("[data-line-width-option]");
+    widthButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        const nextWidth = button.getAttribute("data-line-width-option");
+        if (allowedWidths.indexOf(nextWidth) === -1) return;
+
+        try {
+          window.localStorage.setItem(widthStorageKey, nextWidth);
+        } catch (error) {
+          // Keep the current selection for this page even when storage is unavailable.
+        }
+
+        applyWidth(nextWidth);
+      });
     });
   });
 

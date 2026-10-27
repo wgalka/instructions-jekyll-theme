@@ -1,45 +1,501 @@
+<script>
+  window.MathJax = {
+    startup: {
+      typeset: false,
+    },
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      displayMath: [
+        ["$$", "$$"],
+        ["\\[", "\\]"],
+      ],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    chtml: {
+      scale: 1,
+      matchFontHeight: true,
+    },
+    options: {
+      skipHtmlTags: [
+        "script",
+        "noscript",
+        "style",
+        "textarea",
+        "pre",
+        "code",
+        "annotation",
+        "annotation-xml",
+      ],
+    },
+  };
+</script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
-<script src="{{ '/assets/js/polish-typography.js?v=3' | relative_url }}" defer></script>
+<script>
+  if (window.mermaid) {
+    window.mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+    });
+  }
+</script>
+<script
+  id="MathJax-script"
+  src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"
+  defer
+></script>
+<script src="{{ '/assets/js/polish-typography.js?v=4' | relative_url }}" defer></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    if (!window.mermaid) return;
+    const mathSegmentRegex =
+      /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|(?<!\\)\$[^\$\n]+?(?<!\\)\$/g;
 
-    document.querySelectorAll("pre > code.language-mermaid").forEach(function (code) {
-      const diagram = document.createElement("pre");
-      diagram.className = "mermaid";
-      diagram.dataset.source = code.textContent;
-      diagram.textContent = diagram.dataset.source;
-      code.parentElement.replaceWith(diagram);
-    });
+    function countUnescapedSingleDollars(text) {
+      let count = 0;
+      for (let i = 0; i < text.length; i += 1) {
+        if (text[i] !== "$") continue;
+        if (i > 0 && text[i - 1] === "\\") continue;
+        if (text[i + 1] === "$") {
+          i += 1;
+          continue;
+        }
+        count += 1;
+      }
+      return count;
+    }
+
+    function restoreUnderscoresInsideInlineMath(container) {
+      let insideDollarMath = false;
+      const children = Array.from(container.childNodes);
+
+      children.forEach(function (node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          if (countUnescapedSingleDollars(node.nodeValue) % 2 === 1) {
+            insideDollarMath = !insideDollarMath;
+          }
+          return;
+        }
+
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+        if (insideDollarMath && node.tagName === "EM") {
+          const restored = document.createTextNode("_" + node.textContent + "_");
+          container.replaceChild(restored, node);
+          if (countUnescapedSingleDollars(restored.nodeValue) % 2 === 1) {
+            insideDollarMath = !insideDollarMath;
+          }
+          return;
+        }
+
+        if (
+          !node.matches(
+            "pre, code, kbd, samp, script, style, svg, math, mjx-container, .mermaid-block, .math-block, .math-inline"
+          )
+        ) {
+          restoreUnderscoresInsideInlineMath(node);
+        }
+      });
+
+      container.normalize();
+    }
+
+    function wrapMathTextNodes(root) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (node) {
+          if (!node.nodeValue || (node.nodeValue.indexOf("$") === -1 && node.nodeValue.indexOf("\\") === -1)) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          const parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+          if (
+            parent.closest(
+              "pre, code, kbd, samp, script, style, textarea, svg, math, mjx-container, .mermaid, .mermaid-block, .math-block, .math-inline"
+            )
+          ) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+
+      const textNodes = [];
+      let currentNode = walker.nextNode();
+      while (currentNode) {
+        textNodes.push(currentNode);
+        currentNode = walker.nextNode();
+      }
+
+      textNodes.forEach(function (textNode) {
+        const text = textNode.nodeValue;
+        mathSegmentRegex.lastIndex = 0;
+        const matches = Array.from(text.matchAll(mathSegmentRegex));
+        if (matches.length === 0) return;
+
+        const fragment = document.createDocumentFragment();
+        let lastIndex = 0;
+
+        matches.forEach(function (match) {
+          const matchStart = match.index;
+          const rawMath = match[0];
+
+          if (matchStart > lastIndex) {
+            fragment.appendChild(
+              document.createTextNode(text.slice(lastIndex, matchStart))
+            );
+          }
+
+          const isDisplay =
+            rawMath.indexOf("$$") === 0 || rawMath.indexOf("\\[") === 0;
+          const wrapper = document.createElement("span");
+          wrapper.className = isDisplay ? "math-block" : "math-inline";
+          wrapper.dataset.mathSource = rawMath;
+          wrapper.textContent = rawMath;
+          fragment.appendChild(wrapper);
+
+          lastIndex = matchStart + rawMath.length;
+        });
+
+        if (lastIndex < text.length) {
+          fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+        }
+
+        if (textNode.parentNode) {
+          textNode.parentNode.replaceChild(fragment, textNode);
+        }
+      });
+    }
+
+    function prepareMathBlocks() {
+      const codeBlocks = document.querySelectorAll(
+        "pre > code.language-math, pre > code.language-latex, pre > code.language-tex, " +
+          "div.language-math pre > code, div.language-latex pre > code, div.language-tex pre > code"
+      );
+
+      codeBlocks.forEach(function (code) {
+        const rawSource = (code.textContent || "").trim();
+        if (!rawSource) return;
+
+        const wrappedMath =
+          rawSource.indexOf("$$") === 0 || rawSource.indexOf("\\[") === 0
+            ? rawSource
+            : "\\[\n" + rawSource + "\n\\]";
+
+        const mathBlock = document.createElement("div");
+        mathBlock.className = "math-block";
+        mathBlock.dataset.mathSource = wrappedMath;
+        mathBlock.textContent = wrappedMath;
+
+        const outerWrapper =
+          code.closest("div.language-math, div.language-latex, div.language-tex") ||
+          code.parentElement;
+        if (outerWrapper) {
+          outerWrapper.replaceWith(mathBlock);
+        }
+      });
+
+      const contentRoot = document.querySelector(".markdown-body");
+      if (contentRoot) {
+        contentRoot
+          .querySelectorAll("p, li, td, th, dt, dd, blockquote, figcaption")
+          .forEach(restoreUnderscoresInsideInlineMath);
+        wrapMathTextNodes(contentRoot);
+      }
+    }
+
+    function prepareMermaidBlocks() {
+      const mermaidCodeNodes = document.querySelectorAll(
+        "pre > code.language-mermaid, div.language-mermaid pre > code"
+      );
+
+      mermaidCodeNodes.forEach(function (code) {
+        const source = (code.textContent || "").trim();
+        const container = document.createElement("div");
+        container.className = "mermaid-block";
+        container.dataset.source = source;
+
+        const fallback = document.createElement("pre");
+        fallback.className = "mermaid-fallback";
+        fallback.textContent = source;
+        container.appendChild(fallback);
+
+        const outerWrapper =
+          code.closest("div.language-mermaid") || code.parentElement;
+        if (outerWrapper) {
+          outerWrapper.replaceWith(container);
+        }
+      });
+
+      document
+        .querySelectorAll("pre.mermaid, div.mermaid")
+        .forEach(function (node) {
+          if (node.classList.contains("mermaid-block")) return;
+          const source = (node.dataset.source || node.textContent || "").trim();
+          const container = document.createElement("div");
+          container.className = "mermaid-block";
+          container.dataset.source = source;
+
+          const fallback = document.createElement("pre");
+          fallback.className = "mermaid-fallback";
+          fallback.textContent = source;
+          container.appendChild(fallback);
+
+          node.replaceWith(container);
+        });
+    }
+
+    prepareMermaidBlocks();
+    prepareMathBlocks();
+
+    if (typeof window.applyPolishTypography === "function") {
+      window.applyPolishTypography();
+    }
 
     let mermaidRenderQueue = Promise.resolve();
+    let mermaidRenderToken = 0;
+    let mermaidIdCounter = 0;
+
+    function getMermaidConfig(theme) {
+      const isDark = theme === "dark";
+      return {
+        startOnLoad: false,
+        securityLevel: "strict",
+        theme: isDark ? "dark" : "default",
+        themeVariables: isDark
+          ? {
+              darkMode: true,
+              background: "#111111",
+              primaryColor: "#1e293b",
+              primaryTextColor: "#e6edf3",
+              primaryBorderColor: "#5b91e8",
+              lineColor: "#8ab4f8",
+              secondaryColor: "#1a1a1a",
+              tertiaryColor: "#111111",
+              mainBkg: "#1e293b",
+              secondBkg: "#161616",
+              nodeBorder: "#5b91e8",
+              clusterBkg: "#161616",
+              clusterBorder: "#3a3a3a",
+              defaultLinkColor: "#8ab4f8",
+              titleColor: "#e6edf3",
+              edgeLabelBackground: "#111111",
+              actorBkg: "#1e293b",
+              actorBorder: "#5b91e8",
+              actorTextColor: "#e6edf3",
+              actorLineColor: "#8ab4f8",
+              signalColor: "#e6edf3",
+              signalTextColor: "#e6edf3",
+              labelBoxBkgColor: "#1e293b",
+              labelBoxBorderColor: "#5b91e8",
+              labelTextColor: "#e6edf3",
+              loopTextColor: "#e6edf3",
+              noteBkgColor: "#262626",
+              noteTextColor: "#e6edf3",
+              noteBorderColor: "#555555",
+              textColor: "#e6edf3",
+            }
+          : {
+              darkMode: false,
+              background: "#f6f8fa",
+              primaryColor: "#ddf4ff",
+              primaryTextColor: "#24292f",
+              primaryBorderColor: "#54aeff",
+              lineColor: "#57606a",
+              secondaryColor: "#f6f8fa",
+              tertiaryColor: "#ffffff",
+              mainBkg: "#ddf4ff",
+              secondBkg: "#f6f8fa",
+              nodeBorder: "#54aeff",
+              clusterBkg: "#f6f8fa",
+              clusterBorder: "#d0d7de",
+              defaultLinkColor: "#57606a",
+              titleColor: "#24292f",
+              edgeLabelBackground: "#f6f8fa",
+              actorBkg: "#ddf4ff",
+              actorBorder: "#54aeff",
+              actorTextColor: "#24292f",
+              actorLineColor: "#57606a",
+              signalColor: "#24292f",
+              signalTextColor: "#24292f",
+              labelBoxBkgColor: "#ddf4ff",
+              labelBoxBorderColor: "#54aeff",
+              labelTextColor: "#24292f",
+              loopTextColor: "#24292f",
+              noteBkgColor: "#fff8c5",
+              noteTextColor: "#24292f",
+              noteBorderColor: "#d4a72c",
+              textColor: "#24292f",
+            },
+      };
+    }
+
+    function buildDiagramDefinition(source, config) {
+      const trimmed = source.trim();
+      if (trimmed.indexOf("%%{") === 0) {
+        return trimmed;
+      }
+      const initDirective =
+        "%%{init: " +
+        JSON.stringify({
+          theme: config.theme,
+          themeVariables: config.themeVariables,
+        }) +
+        "}%%\n";
+      return initDirective + trimmed;
+    }
+
+    function cleanupMermaidTempNodes(svgId) {
+      const tempIds = [svgId, "d" + svgId, "i" + svgId];
+      tempIds.forEach(function (id) {
+        const stray = document.getElementById(id);
+        if (stray && !stray.closest(".mermaid-block")) {
+          stray.remove();
+        }
+      });
+    }
 
     function renderMermaid(theme) {
-      mermaidRenderQueue = mermaidRenderQueue.catch(function () {}).then(function () {
-        const diagrams = document.querySelectorAll("pre.mermaid");
-        if (diagrams.length === 0) return;
+      if (!window.mermaid) return Promise.resolve();
 
-        diagrams.forEach(function (diagram) {
-          diagram.removeAttribute("data-processed");
-          if (diagram.dataset.source) diagram.textContent = diagram.dataset.source;
-        });
+      const activeToken = (mermaidRenderToken += 1);
+      const normalizedTheme = theme === "dark" ? "dark" : "light";
 
-        mermaid.initialize({
-          startOnLoad: false,
-          securityLevel: "strict",
-          theme: theme === "dark" ? "dark" : "default",
+      mermaidRenderQueue = mermaidRenderQueue
+        .catch(function () {})
+        .then(async function () {
+          if (activeToken !== mermaidRenderToken) return;
+
+          const blocks = Array.from(
+            document.querySelectorAll(".mermaid-block")
+          );
+          if (blocks.length === 0) return;
+
+          const config = getMermaidConfig(normalizedTheme);
+          window.mermaid.initialize(config);
+
+          for (let index = 0; index < blocks.length; index += 1) {
+            if (activeToken !== mermaidRenderToken) return;
+
+            const block = blocks[index];
+            const source = (block.dataset.source || "").trim();
+            if (!source) continue;
+
+            const svgId =
+              "mermaid-svg-" + index + "-" + (mermaidIdCounter += 1);
+            const sandbox = document.createElement("div");
+            sandbox.style.position = "fixed";
+            sandbox.style.left = "-9999px";
+            sandbox.style.top = "0";
+            sandbox.style.visibility = "hidden";
+            sandbox.style.pointerEvents = "none";
+            document.body.appendChild(sandbox);
+
+            try {
+              const definition = buildDiagramDefinition(source, config);
+              const result = await window.mermaid.render(
+                svgId,
+                definition,
+                sandbox
+              );
+
+              if (activeToken !== mermaidRenderToken) continue;
+
+              if (result && result.svg) {
+                block.innerHTML = result.svg;
+                block.dataset.renderedTheme = normalizedTheme;
+                if (typeof result.bindFunctions === "function") {
+                  result.bindFunctions(block);
+                }
+              }
+            } catch (error) {
+              console.error(
+                "Nie udało się wyrenderować diagramu Mermaid.",
+                error
+              );
+              if (!block.querySelector("svg")) {
+                const fallback = document.createElement("pre");
+                fallback.className = "mermaid-fallback";
+                fallback.textContent = source;
+                block.innerHTML = "";
+                block.appendChild(fallback);
+              }
+            } finally {
+              sandbox.remove();
+              cleanupMermaidTempNodes(svgId);
+            }
+          }
         });
-        return mermaid.run({ nodes: diagrams });
-      }).catch(function (error) {
-        console.error("Nie udało się wyrenderować diagramu Mermaid.", error);
-      });
 
       return mermaidRenderQueue;
     }
 
+    let mathRenderQueue = Promise.resolve();
+
+    function renderMath(forceRestoreBroken) {
+      mathRenderQueue = mathRenderQueue
+        .catch(function () {})
+        .then(async function () {
+          if (!window.MathJax || !window.MathJax.typesetPromise) return;
+
+          if (window.MathJax.startup && window.MathJax.startup.promise) {
+            await window.MathJax.startup.promise;
+          }
+
+          const mathNodes = Array.from(
+            document.querySelectorAll(".math-inline, .math-block")
+          );
+          if (mathNodes.length === 0) {
+            await window.MathJax.typesetPromise();
+            return;
+          }
+
+          const nodesToTypeset = [];
+          mathNodes.forEach(function (node) {
+            const hasRenderedMath = Boolean(node.querySelector("mjx-container"));
+            if (!hasRenderedMath || forceRestoreBroken) {
+              if (!hasRenderedMath && node.dataset.mathSource) {
+                node.textContent = node.dataset.mathSource;
+              }
+              if (!hasRenderedMath) {
+                nodesToTypeset.push(node);
+              }
+            }
+          });
+
+          if (nodesToTypeset.length > 0) {
+            if (typeof window.MathJax.typesetClear === "function") {
+              window.MathJax.typesetClear(nodesToTypeset);
+            }
+            await window.MathJax.typesetPromise(nodesToTypeset);
+          }
+        })
+        .catch(function (error) {
+          console.error("Nie udało się wyrenderować wzorów MathJax.", error);
+        });
+
+      return mathRenderQueue;
+    }
+
+    const MathJaxScript = document.getElementById("MathJax-script");
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      renderMath(false);
+    } else if (MathJaxScript) {
+      MathJaxScript.addEventListener("load", function () {
+        renderMath(false);
+      });
+    }
+
     renderMermaid(document.documentElement.dataset.theme);
+
     document.addEventListener("themechange", function (event) {
       renderMermaid(event.detail.theme);
+      renderMath(true);
+    });
+
+    document.addEventListener("readingwidthchange", function () {
+      renderMath(true);
     });
   });
 </script>

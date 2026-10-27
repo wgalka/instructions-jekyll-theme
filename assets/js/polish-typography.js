@@ -21,6 +21,28 @@
     "(?<![\\p{L}\\p{N}_])(" + shortPolishWordAlternation + ")(\\s+)$",
     "iu"
   );
+  const mathSegmentPattern =
+    /\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|(?<!\\)\$[^\$\n]+?(?<!\\)\$/gu;
+
+  function findMathRanges(text) {
+    const ranges = [];
+    for (const match of text.matchAll(mathSegmentPattern)) {
+      ranges.push({
+        start: match.index,
+        end: match.index + match[0].length,
+      });
+    }
+    return ranges;
+  }
+
+  function isInsideMathRange(index, ranges) {
+    for (let i = 0; i < ranges.length; i += 1) {
+      if (index >= ranges[i].start && index < ranges[i].end) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   function joinShortPolishWords(textNodes, followedByInlineToken) {
     let text = "";
@@ -33,11 +55,21 @@
       }
     });
 
-    const matches = Array.from(text.matchAll(shortPolishWordPattern));
+    const mathRanges = findMathRanges(text);
+    const matches = Array.from(text.matchAll(shortPolishWordPattern)).filter(
+      function (match) {
+        return !isInsideMathRange(match.index, mathRanges);
+      }
+    );
 
     if (followedByInlineToken) {
       const trailingMatch = text.match(shortPolishWordBeforeInlineTokenPattern);
-      if (trailingMatch) matches.push(trailingMatch);
+      if (
+        trailingMatch &&
+        !isInsideMathRange(trailingMatch.index, mathRanges)
+      ) {
+        matches.push(trailingMatch);
+      }
     }
 
     matches.sort(function (left, right) {
@@ -63,6 +95,14 @@
   }
 
   function preventPolishOrphans(paragraph) {
+    if (
+      paragraph.closest(
+        ".mermaid, .mermaid-block, .math-block, mjx-container, .MathJax, svg, math"
+      )
+    ) {
+      return;
+    }
+
     let textNodes = [];
 
     function processTextNodes(followedByInlineToken) {
@@ -80,19 +120,29 @@
 
       if (node.nodeType !== Node.ELEMENT_NODE) return;
 
-      if (node.matches("pre, script, style, br")) {
+      if (
+        node.matches(
+          "pre, script, style, br, svg, math, .mermaid, .mermaid-block, .math-block"
+        )
+      ) {
         processTextNodes();
         return;
       }
 
-      if (node.matches("code, kbd, samp")) {
+      if (
+        node.matches(
+          "code, kbd, samp, mjx-container, .MathJax, .math-inline"
+        )
+      ) {
         processTextNodes(true);
         return;
       }
 
       const isNestedBlock =
         node !== paragraph &&
-        node.matches("p, ul, ol, li, table, blockquote, div, h1, h2, h3, h4, h5, h6");
+        node.matches(
+          "p, ul, ol, li, table, blockquote, div, h1, h2, h3, h4, h5, h6"
+        );
 
       if (isNestedBlock) processTextNodes();
       node.childNodes.forEach(visit);
@@ -103,7 +153,7 @@
     processTextNodes();
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
+  function applyPolishTypography() {
     document
       .querySelectorAll(
         ".markdown-body p, .markdown-body li, .markdown-body h1, .markdown-body h2, " +
@@ -112,5 +162,11 @@
           ".markdown-body figcaption"
       )
       .forEach(preventPolishOrphans);
+  }
+
+  window.applyPolishTypography = applyPolishTypography;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    applyPolishTypography();
   });
 })();

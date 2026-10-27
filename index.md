@@ -41,6 +41,14 @@ def example() -> str:
     return "Uzupełnij ćwiczenie"
 ```
 
+### Przykładowy wzór matematyczny
+
+Złożoność obliczeniowa wynosi $O(n \log n)$, a błąd średniokwadratowy wyraża się wzorem:
+
+$$
+\text{MSE} = \frac{1}{n} \sum_{i=1}^{n} \left( y_i - \hat{y}_i \right)^2
+$$
+
 ### Przykładowy diagram
 
 ```mermaid
