@@ -7,6 +7,11 @@
     "ją", "ku", "ma", "mi", "my", "na", "ni", "no", "od", "on",
     "po", "są", "ta", "te", "to", "tu", "tę", "ty", "we", "wy",
     "za", "ze", "że",
+    "aby", "ale", "ani", "bez", "czy", "dla", "gdy", "ich", "jak",
+    "jej", "już", "lub", "nad", "nie", "nim", "niż", "oko", "oraz",
+    "pod", "przy", "tak", "tam", "też", "więc", "zaś", "znad", "zza",
+    "np\\.", "tzn\\.", "tzw\\.", "ok\\.", "rys\\.", "tab\\.", "pkt\\.",
+    "pkt", "ust\\.", "art\\.", "roz\\.", "str\\.", "zob\\.", "por\\.", "nr",
   ];
   const shortPolishWordAlternation = shortPolishWords
     .sort(function (left, right) {
@@ -21,6 +26,13 @@
     "(?<![\\p{L}\\p{N}_])(" + shortPolishWordAlternation + ")(\\s+)$",
     "iu"
   );
+
+  // Word starting a new sentence after '.', '!', '?', or '…'
+  const sentenceStarterPattern =
+    /(?<=[.!?…]\s+)(\p{Lu}[\p{L}\p{N}-]{0,11})(\s+)(?=\S)/gu;
+  const sentenceStarterBeforeInlineTokenPattern =
+    /(?<=[.!?…]\s+)(\p{Lu}[\p{L}\p{N}-]{0,11})(\s+)$/u;
+
   const mathSegmentPattern =
     /\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|(?<!\\)\$[^\$\n]+?(?<!\\)\$/gu;
 
@@ -56,21 +68,43 @@
     });
 
     const mathRanges = findMathRanges(text);
-    const matches = Array.from(text.matchAll(shortPolishWordPattern)).filter(
-      function (match) {
-        return !isInsideMathRange(match.index, mathRanges);
-      }
-    );
+    const rawMatches = [
+      ...Array.from(text.matchAll(shortPolishWordPattern)),
+      ...Array.from(text.matchAll(sentenceStarterPattern)),
+    ].filter(function (match) {
+      return !isInsideMathRange(match.index, mathRanges);
+    });
 
     if (followedByInlineToken) {
-      const trailingMatch = text.match(shortPolishWordBeforeInlineTokenPattern);
+      const trailingShort = text.match(shortPolishWordBeforeInlineTokenPattern);
       if (
-        trailingMatch &&
-        !isInsideMathRange(trailingMatch.index, mathRanges)
+        trailingShort &&
+        !isInsideMathRange(trailingShort.index, mathRanges)
       ) {
-        matches.push(trailingMatch);
+        rawMatches.push(trailingShort);
+      }
+
+      const trailingStarter = text.match(
+        sentenceStarterBeforeInlineTokenPattern
+      );
+      if (
+        trailingStarter &&
+        !isInsideMathRange(trailingStarter.index, mathRanges)
+      ) {
+        rawMatches.push(trailingStarter);
       }
     }
+
+    const seenWhitespaceStarts = new Set();
+    const matches = [];
+
+    rawMatches.forEach(function (match) {
+      const whitespaceStart = match.index + match[1].length;
+      if (!seenWhitespaceStarts.has(whitespaceStart)) {
+        seenWhitespaceStarts.add(whitespaceStart);
+        matches.push(match);
+      }
+    });
 
     matches.sort(function (left, right) {
       return left.index - right.index;
@@ -141,7 +175,7 @@
       const isNestedBlock =
         node !== paragraph &&
         node.matches(
-          "p, ul, ol, li, table, blockquote, div, h1, h2, h3, h4, h5, h6"
+          "p, ul, ol, li, table, blockquote, div, details, summary, h1, h2, h3, h4, h5, h6"
         );
 
       if (isNestedBlock) processTextNodes();
@@ -159,7 +193,7 @@
         ".markdown-body p, .markdown-body li, .markdown-body h1, .markdown-body h2, " +
           ".markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6, " +
           ".markdown-body th, .markdown-body td, .markdown-body dt, .markdown-body dd, " +
-          ".markdown-body figcaption"
+          ".markdown-body figcaption, .markdown-body summary"
       )
       .forEach(preventPolishOrphans);
   }
