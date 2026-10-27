@@ -5,6 +5,15 @@
 
 .markdown-body > p,
 .markdown-body li > p,
+.markdown-body li,
+.markdown-body blockquote > p,
+.markdown-body details > p {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.markdown-body > p,
+.markdown-body li > p,
 .markdown-body blockquote > p,
 .markdown-body details > p {
   text-align: justify;
@@ -75,8 +84,30 @@
 .markdown-body code {
   hyphens: none;
   -webkit-hyphens: none;
-  overflow-wrap: normal;
-  word-break: normal;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.markdown-body :not(pre) > code .code-seg.is-wrapped::before {
+  content: "";
+  display: inline-block;
+  width: 0.95em;
+  height: 1.05em;
+  margin-right: 0.12em;
+  vertical-align: -0.18em;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTc2MDZhIiBzdHJva2Utb3BhY2l0eT0iMC41NSIgc3Ryb2tlLXdpZHRoPSIxLjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTQgNHY3YTMgMyAwIDAgMCAzIDNoNiIvPjxwYXRoIGQ9Im0xMCAxMSAzIDMtMyAzIi8+PC9zdmc+");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+:root[data-theme="dark"] .markdown-body :not(pre) > code .code-seg.is-wrapped::before {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjODU4NTg1IiBzdHJva2Utb3BhY2l0eT0iMC42NSIgc3Ryb2tlLXdpZHRoPSIxLjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTQgNHY3YTMgMyAwIDAgMCAzIDNoNiIvPjxwYXRoIGQ9Im0xMCAxMSAzIDMtMyAzIi8+PC9zdmc+");
 }
 
 :root {

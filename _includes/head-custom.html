@@ -747,6 +747,117 @@
         .forEach(wrapCodeBlockLines);
     }
 
+    const codeBreakSplitPattern =
+      /(?<=[\p{L}\p{N}_)\]>])(?=\.[\p{L}_])|(?<=[([{\/,;])(?=[^\s)\]}])|(?<=[A-Za-z0-9]_)(?=[A-Za-z0-9])|(?<=\S)(?=(?:->|::)\S)/gu;
+
+    function prepareInlineCodeWrapping() {
+      document
+        .querySelectorAll(".markdown-body :not(pre) > code")
+        .forEach(function (code) {
+          if (
+            code.dataset.inlineWrapped === "true" ||
+            code.children.length > 0
+          ) {
+            return;
+          }
+
+          const rawText = code.textContent || "";
+          if (rawText.length < 12) return;
+
+          const parts = rawText.split(codeBreakSplitPattern);
+          if (parts.length <= 1) return;
+
+          const fragment = document.createDocumentFragment();
+          parts.forEach(function (part, index) {
+            if (index > 0) {
+              fragment.appendChild(document.createElement("wbr"));
+            }
+            const seg = document.createElement("span");
+            seg.className = "code-seg";
+            seg.textContent = part;
+            fragment.appendChild(seg);
+          });
+
+          code.textContent = "";
+          code.appendChild(fragment);
+          code.dataset.inlineWrapped = "true";
+        });
+
+      const root = document.querySelector(".markdown-body");
+      if (!root) return;
+
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (node) {
+          if (!node.nodeValue || node.nodeValue.length < 24) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          if (!/\S{24,}/.test(node.nodeValue)) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          const parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+          if (
+            parent.closest(
+              "pre, code, kbd, samp, script, style, textarea, svg, math, mjx-container, .mermaid-block, .math-block, .math-inline"
+            )
+          ) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+
+      const longTextNodes = [];
+      let current = walker.nextNode();
+      while (current) {
+        longTextNodes.push(current);
+        current = walker.nextNode();
+      }
+
+      longTextNodes.forEach(function (textNode) {
+        const parts = textNode.nodeValue.split(codeBreakSplitPattern);
+        if (parts.length <= 1) return;
+
+        const fragment = document.createDocumentFragment();
+        parts.forEach(function (part, index) {
+          if (index > 0) {
+            fragment.appendChild(document.createElement("wbr"));
+          }
+          fragment.appendChild(document.createTextNode(part));
+        });
+
+        if (textNode.parentNode) {
+          textNode.parentNode.replaceChild(fragment, textNode);
+        }
+      });
+    }
+
+    function updateInlineCodeWrapMarkers() {
+      document
+        .querySelectorAll('.markdown-body code[data-inline-wrapped="true"]')
+        .forEach(function (code) {
+          const segments = code.querySelectorAll(".code-seg");
+          segments.forEach(function (seg) {
+            seg.classList.remove("is-wrapped");
+          });
+
+          if (code.getClientRects().length <= 1) return;
+
+          for (let i = 1; i < segments.length; i += 1) {
+            const prevRects = segments[i - 1].getClientRects();
+            const currRects = segments[i].getClientRects();
+            if (prevRects.length === 0 || currRects.length === 0) continue;
+
+            const prevBottomLineTop = prevRects[prevRects.length - 1].top;
+            const currFirstLineTop = currRects[0].top;
+
+            if (currFirstLineTop > prevBottomLineTop + 3) {
+              segments[i].classList.add("is-wrapped");
+            }
+          }
+        });
+    }
+
     repairDetailsBlocks();
     prepareMermaidBlocks();
     prepareMathBlocks();
@@ -756,6 +867,9 @@
     if (typeof window.applyPolishTypography === "function") {
       window.applyPolishTypography();
     }
+
+    prepareInlineCodeWrapping();
+    updateInlineCodeWrapMarkers();
 
     let mermaidRenderQueue = Promise.resolve();
     let mermaidRenderToken = 0;
@@ -1000,6 +1114,18 @@
 
     document.addEventListener("readingwidthchange", function () {
       renderMath(true);
+      updateInlineCodeWrapMarkers();
+      window.setTimeout(updateInlineCodeWrapMarkers, 180);
+    });
+
+    window.addEventListener("resize", function () {
+      updateInlineCodeWrapMarkers();
+    });
+
+    document.querySelectorAll(".markdown-body details").forEach(function (details) {
+      details.addEventListener("toggle", function () {
+        updateInlineCodeWrapMarkers();
+      });
     });
   });
 </script>
