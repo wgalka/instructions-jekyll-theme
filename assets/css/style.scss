@@ -15,53 +15,44 @@
 
 .markdown-body details {
   margin: 1rem 0 1.25rem 0;
-  padding: 0.85rem 1.1rem;
-  background: linear-gradient(135deg, rgba(9, 105, 218, 0.055) 0%, rgba(246, 248, 250, 0.95) 100%);
-  border: 1px solid rgba(9, 105, 218, 0.24);
-  border-left: 4px solid #0969da;
-  border-radius: 8px;
+  padding: 0.9rem 1.15rem;
+  background: linear-gradient(135deg, rgba(9, 105, 218, 0.08) 0%, rgba(84, 174, 255, 0.04) 55%, rgba(246, 248, 250, 0.85) 100%);
+  border: 0;
+  border-radius: 10px;
   box-sizing: border-box;
-  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  transition: background 180ms ease;
 }
 
 .markdown-body details[open] {
-  background: linear-gradient(160deg, rgba(9, 105, 218, 0.075) 0%, rgba(246, 248, 250, 0.96) 45%, #ffffff 100%);
-  box-shadow: 0 4px 14px rgba(9, 105, 218, 0.07);
+  background: linear-gradient(145deg, rgba(9, 105, 218, 0.09) 0%, rgba(84, 174, 255, 0.045) 50%, rgba(246, 248, 250, 0.9) 100%);
 }
 
 .markdown-body details > summary {
-  margin: -0.85rem -1.1rem;
-  padding: 0.75rem 1.1rem;
   cursor: pointer;
   font-weight: 600;
   color: var(--theme-link);
-  border-radius: 7px;
   outline: none;
   user-select: none;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition: opacity 150ms ease;
 }
 
 .markdown-body details > summary:hover {
-  background-color: rgba(9, 105, 218, 0.08);
+  opacity: 0.85;
 }
 
 .markdown-body details > summary:focus-visible {
   outline: 2px solid var(--theme-link);
-  outline-offset: -2px;
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 .markdown-body details[open] > summary {
-  margin-bottom: 0.9rem;
-  background-color: rgba(9, 105, 218, 0.08);
-  border-bottom: 1px solid rgba(9, 105, 218, 0.24);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+  margin-bottom: 0.75rem;
 }
 
 .markdown-body details pre,
 .markdown-body details .highlight pre {
-  background-color: #ffffff;
-  border: 1px solid var(--theme-border);
+  background-color: rgba(255, 255, 255, 0.75);
 }
 
 .markdown-body details > :last-child {
@@ -69,29 +60,16 @@
 }
 
 :root[data-theme="dark"] .markdown-body details {
-  background: linear-gradient(135deg, rgba(138, 180, 248, 0.09) 0%, rgba(17, 17, 17, 0.96) 100%);
-  border-color: rgba(138, 180, 248, 0.24);
-  border-left-color: #8ab4f8;
+  background: linear-gradient(135deg, rgba(138, 180, 248, 0.13) 0%, rgba(91, 145, 232, 0.06) 55%, rgba(20, 24, 32, 0.85) 100%);
 }
 
 :root[data-theme="dark"] .markdown-body details[open] {
-  background: linear-gradient(160deg, rgba(138, 180, 248, 0.11) 0%, rgba(18, 22, 31, 0.96) 45%, #0a0c10 100%);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-:root[data-theme="dark"] .markdown-body details > summary:hover {
-  background-color: rgba(138, 180, 248, 0.12);
-}
-
-:root[data-theme="dark"] .markdown-body details[open] > summary {
-  background-color: rgba(138, 180, 248, 0.12);
-  border-bottom-color: rgba(138, 180, 248, 0.24);
+  background: linear-gradient(145deg, rgba(138, 180, 248, 0.14) 0%, rgba(91, 145, 232, 0.07) 50%, rgba(18, 22, 30, 0.92) 100%);
 }
 
 :root[data-theme="dark"] .markdown-body details pre,
 :root[data-theme="dark"] .markdown-body details .highlight pre {
-  background-color: #080808;
-  border-color: var(--theme-border);
+  background-color: rgba(0, 0, 0, 0.45);
 }
 
 .markdown-body code {
