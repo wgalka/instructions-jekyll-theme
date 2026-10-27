@@ -10,6 +10,7 @@ plugins:
 markdown: kramdown
 kramdown:
   input: GFM
+  parse_block_html: true
 
 exclude:
   - Gemfile

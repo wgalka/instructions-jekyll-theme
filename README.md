@@ -11,6 +11,9 @@ Motyw Jekyll dla GitHub Pages, oparty na oryginalnym layoucie i stylach [Primer 
    remote_theme: TWOJ_LOGIN/TWOJE_REPO@v1.0.0
    plugins:
      - jekyll-remote-theme
+   kramdown:
+     input: GFM
+     parse_block_html: true
    ```
 
    Zastąp `TWOJ_LOGIN/TWOJE_REPO` właścicielem i nazwą tego repozytorium. Po opublikowaniu tagu `v1.0.0` można przypinać strony do tej wersji.

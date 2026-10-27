@@ -50,6 +50,349 @@
 <script src="{{ '/assets/js/polish-typography.js?v=4' | relative_url }}" defer></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    const standardHtmlTags = new Set([
+      "a", "abbr", "address", "area", "article", "aside", "audio", "b", "bdi",
+      "bdo", "blockquote", "br", "button", "canvas", "caption", "cite", "code",
+      "col", "colgroup", "data", "datalist", "dd", "del", "details", "dfn",
+      "dialog", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption",
+      "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header",
+      "hgroup", "hr", "i", "iframe", "img", "input", "ins", "kbd", "label",
+      "legend", "li", "main", "map", "mark", "math", "menu", "meter", "nav",
+      "noscript", "object", "ol", "optgroup", "option", "output", "p", "picture",
+      "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script",
+      "search", "section", "select", "slot", "small", "source", "span", "strong",
+      "style", "sub", "summary", "sup", "svg", "table", "tbody", "td",
+      "template", "textarea", "tfoot", "th", "thead", "time", "tr", "track",
+      "u", "ul", "var", "video", "wbr", "mjx-container",
+    ]);
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function slugifyHeading(text) {
+      return text
+        .toLowerCase()
+        .replace(/<[^>]+>/g, "")
+        .replace(/[^\p{L}\p{N}\s-]/gu, "")
+        .trim()
+        .replace(/\s+/g, "-");
+    }
+
+    function renderInlineMarkdown(text) {
+      const codeSpans = [];
+      let processed = text.replace(/`([^`\n]+)`/g, function (_, code) {
+        const token = "\u0000CODE" + codeSpans.length + "\u0000";
+        codeSpans.push("<code>" + escapeHtml(code) + "</code>");
+        return token;
+      });
+
+      processed = processed.replace(
+        /!\[([^\]]*)\]\(([^)]+)\)/g,
+        function (_, alt, src) {
+          return (
+            '<img src="' +
+            escapeHtml(src.trim()) +
+            '" alt="' +
+            escapeHtml(alt) +
+            '">'
+          );
+        }
+      );
+
+      processed = processed.replace(
+        /\[([^\]]+)\]\(([^)]+)\)/g,
+        function (_, label, href) {
+          return (
+            '<a href="' +
+            escapeHtml(href.trim()) +
+            '">' +
+            label +
+            "</a>"
+          );
+        }
+      );
+
+      processed = processed.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      processed = processed.replace(
+        /(?<![\p{L}\p{N}_*])\*([^*\n]+)\*(?![\p{L}\p{N}_*])/gu,
+        "<em>$1</em>"
+      );
+
+      processed = processed.replace(/\u0000CODE(\d+)\u0000/g, function (_, idx) {
+        return codeSpans[Number(idx)];
+      });
+
+      return processed;
+    }
+
+    function compileMarkdownToHtml(markdown) {
+      const normalized = markdown.replace(/\r\n/g, "\n");
+      const lines = normalized.split("\n");
+      const htmlParts = [];
+      let i = 0;
+
+      while (i < lines.length) {
+        const line = lines[i];
+        const trimmed = line.trim();
+
+        if (!trimmed) {
+          i += 1;
+          continue;
+        }
+
+        const fenceMatch = trimmed.match(/^(`{3,}|~{3,})(\S*)\s*$/);
+        if (fenceMatch) {
+          const fence = fenceMatch[1];
+          const lang = fenceMatch[2];
+          const codeLines = [];
+          i += 1;
+          while (i < lines.length && !lines[i].trim().startsWith(fence)) {
+            codeLines.push(lines[i]);
+            i += 1;
+          }
+          if (i < lines.length) i += 1;
+          const langAttr = lang
+            ? ' class="language-' + escapeHtml(lang) + '"'
+            : "";
+          htmlParts.push(
+            "<pre><code" +
+              langAttr +
+              ">" +
+              escapeHtml(codeLines.join("\n")) +
+              "</code></pre>"
+          );
+          continue;
+        }
+
+        const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
+        if (headingMatch) {
+          const level = headingMatch[1].length;
+          const headingHtml = renderInlineMarkdown(headingMatch[2]);
+          const id = slugifyHeading(headingMatch[2]);
+          htmlParts.push(
+            "<h" +
+              level +
+              (id ? ' id="' + escapeHtml(id) + '"' : "") +
+              ">" +
+              headingHtml +
+              "</h" +
+              level +
+              ">"
+          );
+          i += 1;
+          continue;
+        }
+
+        const listMatch = line.match(/^(\s*)(\d+\.|[-*+])\s+(.+)$/);
+        if (listMatch) {
+          const isOrdered = /^\d+\./.test(listMatch[2]);
+          const listTag = isOrdered ? "ol" : "ul";
+          const items = [];
+
+          while (i < lines.length) {
+            const currentLine = lines[i];
+            if (!currentLine.trim()) {
+              i += 1;
+              break;
+            }
+            const itemMatch = currentLine.match(/^(\s*)(\d+\.|[-*+])\s+(.+)$/);
+            if (!itemMatch) break;
+
+            const itemIndent = itemMatch[1].length;
+            const itemIsOrdered = /^\d+\./.test(itemMatch[2]);
+            if (itemIndent === 0 && itemIsOrdered !== isOrdered && items.length > 0) {
+              break;
+            }
+
+            let itemContent = renderInlineMarkdown(itemMatch[3]);
+            const subItems = [];
+            i += 1;
+
+            while (i < lines.length) {
+              const nextLine = lines[i];
+              const subMatch = nextLine.match(/^(\s+)([-*+]|\d+\.)\s+(.+)$/);
+              if (subMatch && subMatch[1].length > itemIndent) {
+                subItems.push({
+                  ordered: /^\d+\./.test(subMatch[2]),
+                  html: renderInlineMarkdown(subMatch[3]),
+                });
+                i += 1;
+              } else {
+                break;
+              }
+            }
+
+            if (subItems.length > 0) {
+              const subTag = subItems[0].ordered ? "ol" : "ul";
+              itemContent +=
+                "<" +
+                subTag +
+                ">" +
+                subItems
+                  .map(function (s) {
+                    return "<li>" + s.html + "</li>";
+                  })
+                  .join("") +
+                "</" +
+                subTag +
+                ">";
+            }
+
+            items.push("<li>" + itemContent + "</li>");
+          }
+
+          htmlParts.push("<" + listTag + ">" + items.join("") + "</" + listTag + ">");
+          continue;
+        }
+
+        const paragraphLines = [];
+        while (
+          i < lines.length &&
+          lines[i].trim() &&
+          !/^(`{3,}|~{3,})/.test(lines[i].trim()) &&
+          !/^#{1,6}\s+/.test(lines[i].trim()) &&
+          !/^\s*(\d+\.|[-*+])\s+/.test(lines[i])
+        ) {
+          paragraphLines.push(lines[i].trim());
+          i += 1;
+        }
+
+        if (paragraphLines.length > 0) {
+          htmlParts.push(
+            "<p>" + renderInlineMarkdown(paragraphLines.join(" ")) + "</p>"
+          );
+        }
+      }
+
+      return htmlParts.join("\n");
+    }
+
+    function repairDetailsBlocks() {
+      const detailsElements = Array.from(
+        document.querySelectorAll(".markdown-body details")
+      );
+
+      detailsElements.forEach(function (details) {
+        const rawText = details.textContent || "";
+        const hasUnknownTags = Array.from(details.querySelectorAll("*")).some(
+          function (el) {
+            return !standardHtmlTags.has(el.localName.toLowerCase());
+          }
+        );
+        const hasLiteralCloseDetails = rawText.indexOf("</details>") !== -1;
+        const hasUncompiledBackticks = /`[^`]+`/.test(rawText);
+
+        if (!hasUnknownTags && !hasLiteralCloseDetails && !hasUncompiledBackticks) {
+          return;
+        }
+
+        const caseMap = {};
+        const identifierMatches = rawText.match(/[A-Za-z][A-Za-z0-9_:]*/g) || [];
+        identifierMatches.forEach(function (word) {
+          if (word !== word.toLowerCase()) {
+            caseMap[word.toLowerCase()] = word;
+          }
+        });
+
+        function restoreCase(token) {
+          const clean = token.replace(/,+$/, "");
+          const suffix = token.slice(clean.length);
+          const restored = caseMap[clean.toLowerCase()] || clean;
+          return restored + suffix;
+        }
+
+        function extractReconstructedMarkdown(node) {
+          if (node.nodeType === Node.TEXT_NODE) {
+            return node.nodeValue;
+          }
+          if (node.nodeType !== Node.ELEMENT_NODE) {
+            return "";
+          }
+
+          const tag = node.localName.toLowerCase();
+          if (!standardHtmlTags.has(tag)) {
+            const restoredTag = restoreCase(tag);
+            const attrParts = [];
+            Array.from(node.attributes).forEach(function (attr) {
+              if (attr.value === "") {
+                attrParts.push(restoreCase(attr.name));
+              } else {
+                attrParts.push(attr.name + '="' + attr.value + '"');
+              }
+            });
+            const openTagText =
+              "<" +
+              restoredTag +
+              (attrParts.length > 0 ? " " + attrParts.join(" ") : "") +
+              ">";
+            let inner = "";
+            node.childNodes.forEach(function (child) {
+              inner += extractReconstructedMarkdown(child);
+            });
+            return openTagText + inner;
+          }
+
+          let childrenText = "";
+          node.childNodes.forEach(function (child) {
+            childrenText += extractReconstructedMarkdown(child);
+          });
+          return childrenText;
+        }
+
+        const summary = details.querySelector(":scope > summary");
+        let reconstructed = "";
+
+        Array.from(details.childNodes).forEach(function (child) {
+          if (child === summary) return;
+          reconstructed += extractReconstructedMarkdown(child);
+        });
+
+        let insideMarkdown = reconstructed;
+        let outsideMarkdown = "";
+
+        const closeDetailsIndex = reconstructed.indexOf("</details>");
+        if (closeDetailsIndex !== -1) {
+          insideMarkdown = reconstructed.slice(0, closeDetailsIndex);
+          outsideMarkdown = reconstructed.slice(
+            closeDetailsIndex + "</details>".length
+          );
+        }
+
+        Array.from(details.childNodes).forEach(function (child) {
+          if (child !== summary) {
+            child.remove();
+          }
+        });
+
+        const insideContainer = document.createElement("div");
+        insideContainer.innerHTML = compileMarkdownToHtml(insideMarkdown);
+        while (insideContainer.firstChild) {
+          details.appendChild(insideContainer.firstChild);
+        }
+
+        if (outsideMarkdown.trim().length > 0 && details.parentNode) {
+          const outsideContainer = document.createElement("div");
+          outsideContainer.innerHTML = compileMarkdownToHtml(outsideMarkdown);
+          const referenceNode = details.nextSibling;
+          while (outsideContainer.firstChild) {
+            details.parentNode.insertBefore(
+              outsideContainer.firstChild,
+              referenceNode
+            );
+          }
+        }
+      });
+
+      if (window.anchors && typeof window.anchors.add === "function") {
+        window.anchors.add();
+      }
+    }
+
     const mathSegmentRegex =
       /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|(?<!\\)\$[^\$\n]+?(?<!\\)\$/g;
 
@@ -251,12 +594,64 @@
     }
 
     function prepareResponsiveTables() {
+      function isWrapperExpanded(wrapper) {
+        if (wrapper.dataset.tableState) {
+          return wrapper.dataset.tableState === "wide";
+        }
+        return document.documentElement.dataset.tableMode === "wide";
+      }
+
+      function syncTableWrapperState(wrapper) {
+        const expanded = isWrapperExpanded(wrapper);
+        wrapper.classList.toggle("is-expanded", expanded);
+        const btn = wrapper.querySelector(".table-wrapper__toggle");
+        if (btn) {
+          btn.setAttribute("aria-pressed", String(expanded));
+          btn.setAttribute(
+            "title",
+            expanded
+              ? "Dopasuj tabelę do kolumny tekstu (zawijaj wiersze)"
+              : "Rozszerz tabelę na pełną szerokość okna"
+          );
+          btn.setAttribute(
+            "aria-label",
+            expanded
+              ? "Dopasuj tabelę do kolumny tekstu"
+              : "Rozszerz tabelę na pełną szerokość"
+          );
+        }
+      }
+
       document.querySelectorAll(".markdown-body table").forEach(function (table) {
         if (table.closest(".table-wrapper")) return;
         const wrapper = document.createElement("div");
         wrapper.className = "table-wrapper";
+
+        const toggleBtn = document.createElement("button");
+        toggleBtn.type = "button";
+        toggleBtn.className = "table-wrapper__toggle";
+        toggleBtn.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+          '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>' +
+          "</svg>";
+
+        toggleBtn.addEventListener("click", function () {
+          const nextExpanded = !isWrapperExpanded(wrapper);
+          wrapper.dataset.tableState = nextExpanded ? "wide" : "wrap";
+          syncTableWrapperState(wrapper);
+        });
+
         table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(toggleBtn);
         wrapper.appendChild(table);
+        syncTableWrapperState(wrapper);
+      });
+
+      document.addEventListener("tablemodechange", function () {
+        document.querySelectorAll(".markdown-body .table-wrapper").forEach(function (wrapper) {
+          delete wrapper.dataset.tableState;
+          syncTableWrapperState(wrapper);
+        });
       });
     }
 
@@ -308,19 +703,16 @@
           const clone = node.cloneNode(false);
           currentInsertionTarget.appendChild(clone);
           activeElementStack.push(node);
-          const previousTarget = currentInsertionTarget;
           currentInsertionTarget = clone;
 
           node.childNodes.forEach(walk);
 
           activeElementStack.pop();
-          // Restore target to the matching depth in the current line
           let target = lines[lines.length - 1];
           for (let depth = 0; depth < activeElementStack.length; depth += 1) {
             target = target.lastElementChild || target;
           }
           currentInsertionTarget = target;
-          void previousTarget;
         }
       }
 
@@ -355,6 +747,7 @@
         .forEach(wrapCodeBlockLines);
     }
 
+    repairDetailsBlocks();
     prepareMermaidBlocks();
     prepareMathBlocks();
     prepareResponsiveTables();

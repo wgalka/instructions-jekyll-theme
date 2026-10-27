@@ -3,8 +3,10 @@
 
   const themeStorageKey = "instructions-theme";
   const widthStorageKey = "instructions-line-width";
+  const tableModeStorageKey = "instructions-table-mode";
   const allowedWidths = ["45", "55", "65", "80", "100"];
   const defaultWidth = "55";
+  const defaultTableMode = "wrap";
   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
 
   function readSavedTheme() {
@@ -20,6 +22,15 @@
     try {
       const savedWidth = window.localStorage.getItem(widthStorageKey);
       return allowedWidths.indexOf(savedWidth) !== -1 ? savedWidth : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function readSavedTableMode() {
+    try {
+      const savedMode = window.localStorage.getItem(tableModeStorageKey);
+      return savedMode === "wrap" || savedMode === "wide" ? savedMode : null;
     } catch (error) {
       return null;
     }
@@ -45,6 +56,19 @@
     });
   }
 
+  function updateTableModeButton(mode) {
+    const toggle = document.getElementById("table-mode-toggle");
+    if (!toggle) return;
+
+    const isWide = mode === "wide";
+    const label = isWide
+      ? "Dopasuj tabele do szerokości tekstu (zawijaj tekst)"
+      : "Rozszerz tabele na pełną szerokość okna";
+    toggle.setAttribute("title", label);
+    toggle.setAttribute("aria-pressed", String(isWide));
+    toggle.classList.toggle("is-active", isWide);
+  }
+
   function applyTheme(theme) {
     const normalizedTheme = theme === "dark" ? "dark" : "light";
     document.documentElement.dataset.theme = normalizedTheme;
@@ -65,16 +89,28 @@
     );
   }
 
+  function applyTableMode(mode) {
+    const normalizedMode = mode === "wide" ? "wide" : "wrap";
+    document.documentElement.dataset.tableMode = normalizedMode;
+    updateTableModeButton(normalizedMode);
+
+    document.dispatchEvent(
+      new CustomEvent("tablemodechange", { detail: { mode: normalizedMode } })
+    );
+  }
+
   function getSystemTheme() {
     return systemTheme.matches ? "dark" : "light";
   }
 
   applyTheme(readSavedTheme() || getSystemTheme());
   applyWidth(readSavedWidth() || defaultWidth);
+  applyTableMode(readSavedTableMode() || defaultTableMode);
 
   document.addEventListener("DOMContentLoaded", function () {
     updateThemeButton(document.documentElement.dataset.theme);
     updateWidthButtons(document.documentElement.dataset.lineWidth || defaultWidth);
+    updateTableModeButton(document.documentElement.dataset.tableMode || defaultTableMode);
 
     const controls = document.getElementById("reading-controls");
     const trigger = document.getElementById("reading-controls-trigger");
@@ -116,6 +152,22 @@
         }
 
         applyTheme(nextTheme);
+      });
+    }
+
+    const tableModeToggle = document.getElementById("table-mode-toggle");
+    if (tableModeToggle) {
+      tableModeToggle.addEventListener("click", function () {
+        const nextMode =
+          document.documentElement.dataset.tableMode === "wide" ? "wrap" : "wide";
+
+        try {
+          window.localStorage.setItem(tableModeStorageKey, nextMode);
+        } catch (error) {
+          // Keep the current selection for this page even when storage is unavailable.
+        }
+
+        applyTableMode(nextMode);
       });
     }
 
