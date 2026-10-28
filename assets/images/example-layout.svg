@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300" role="img" aria-labelledby="title desc">
+  <title id="title">Przykładowy układ okna aplikacji</title>
+  <desc id="desc">Pasek tytułu nad menu po lewej i panelem treści po prawej.</desc>
+  <rect width="720" height="300" fill="#171b24"/>
+  <g fill="#242b38" stroke="#526078" stroke-width="2">
+    <rect x="32" y="28" width="656" height="48" rx="8"/>
+    <rect x="32" y="92" width="160" height="180" rx="8"/>
+    <rect x="208" y="92" width="480" height="180" rx="8"/>
+  </g>
+  <g fill="#d1d8e3" font-family="sans-serif" font-size="20" text-anchor="middle">
+    <text x="360" y="59">Okno aplikacji</text>
+    <text x="112" y="189">Menu</text>
+    <text x="448" y="189">Treść</text>
+  </g>
+</svg>

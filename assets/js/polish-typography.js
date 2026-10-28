@@ -131,7 +131,7 @@
   function preventPolishOrphans(paragraph) {
     if (
       paragraph.closest(
-        ".mermaid, .mermaid-block, .math-block, mjx-container, .MathJax, svg, math"
+        ".code-caption, .code-example > figcaption, .mermaid, .mermaid-block, .math-block, mjx-container, .MathJax, svg, math"
       )
     ) {
       return;

@@ -337,6 +337,99 @@ body {
   overflow-x: hidden;
 }
 
+.markdown-body .code-caption,
+.markdown-body .code-example > figcaption,
+.markdown-body .image-example > figcaption,
+.markdown-body .table-example > figcaption,
+.markdown-body table > caption {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  color: var(--theme-text);
+  background-color: var(--theme-surface-raised);
+  border: 1px solid var(--theme-border);
+  font-size: 0.85em;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: none;
+  -webkit-hyphens: none;
+}
+
+.markdown-body .code-caption,
+.markdown-body .code-example > figcaption,
+.markdown-body .image-example > figcaption {
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  break-after: avoid;
+}
+
+.markdown-body .code-caption,
+.markdown-body .code-example > figcaption {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  white-space: pre-wrap;
+}
+
+.markdown-body .code-example > figcaption > p,
+.markdown-body .image-example > figcaption > p,
+.markdown-body .table-example > figcaption > p {
+  margin: 0;
+  text-align: inherit;
+  hyphens: inherit;
+  -webkit-hyphens: inherit;
+}
+
+.markdown-body .code-caption + .highlighter-rouge,
+.markdown-body .code-caption + .highlight,
+.markdown-body .code-caption + pre,
+.markdown-body .code-example > .highlighter-rouge,
+.markdown-body .code-example > .highlight,
+.markdown-body .code-example > pre {
+  margin-top: 0;
+  margin-bottom: 16px;
+  border: 1px solid var(--theme-border);
+  border-radius: 0 0 6px 6px;
+}
+
+.markdown-body .code-caption + .highlighter-rouge .highlight,
+.markdown-body .code-caption + .highlighter-rouge pre,
+.markdown-body .code-caption + .highlight pre,
+.markdown-body .code-example .highlight,
+.markdown-body .code-example pre {
+  margin-top: 0;
+  margin-bottom: 0;
+  border-radius: 0 0 6px 6px;
+}
+
+.markdown-body .code-example > .highlighter-rouge,
+.markdown-body .image-example > p,
+.markdown-body .table-example > table,
+.markdown-body .table-example > .table-wrapper {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body .image-example img {
+  margin: 0;
+  border: 1px solid var(--theme-border);
+  border-radius: 0 0 6px 6px;
+}
+
+.markdown-body .table-example > figcaption,
+.markdown-body table > caption {
+  caption-side: bottom;
+  border-top: 0;
+  border-radius: 0 0 6px 6px;
+  color: var(--theme-muted);
+  font-weight: 400;
+  break-before: avoid;
+}
+
 .markdown-body pre > code[data-wrapped-lines="true"] {
   display: block;
   white-space: normal;

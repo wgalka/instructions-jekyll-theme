@@ -23,6 +23,58 @@ GitHub Pages obsługuje `remote_theme` z repozytorium GitHub; plugin `jekyll-rem
 
 `_layouts/default.html` zachowuje układ Primer, `assets/css/style.scss` importuje jego oryginalne style i justuje akapity z automatycznym dzieleniem wyrazów. Fragmenty kodu nie są dzielone. Skrypt `assets/js/polish-typography.js` łączy twardą spacją częste krótkie polskie wyrazy (np. `a`, `i`, `w`, `z`, `do`, `na`, `po`, `że`) z następnym wyrazem, również gdy jest on zapisany jako kod inline lub wzór matematyczny, pomijając zawartość bloków kodu, diagramów i równań. Panel w prawym górnym rogu pozwala przełączać motyw jasny/ciemny oraz maksymalną szerokość linii tekstu (`45`, `55`, `65`, `80` lub `100` znaków, domyślnie `55`), dopasowując jednocześnie szerokość zdjęć, bloków kodu, tabel, diagramów i wzorów; oba ustawienia są zapamiętywane w `localStorage`. `_includes/head-custom.html` odpowiada za renderowanie diagramów `mermaid` oraz równań matematycznych `MathJax` (`$...$`, `$$...$$`, `\(...\)`, `\[...\]` i bloków `math`/`latex`) z zabezpieczeniem przed utratą lub uszkodzeniem elementów podczas przełączania motywu jasny/ciemny i zmiany szerokości kolumny. `index.md` służy jako demonstracyjna instrukcja i wzór treści.
 
+## Podpisy kodu, obrazów i tabel
+
+Element `figure` grupuje treść z jej podpisem `figcaption`. Atrybut `markdown="1"` pozwala używać zwykłego Markdown wewnątrz. Zachowuj puste linie oddzielające podpis, kod, obraz lub tabelę, tak jak w przykładach.
+
+### Kod — nazwa pliku nad blokiem
+
+````markdown
+<figure class="code-example" markdown="1">
+<figcaption>Person.java</figcaption>
+
+```java
+public class Person {
+    private String name;
+}
+```
+
+</figure>
+````
+
+Możesz podać też ścieżkę, np. `src/main/java/Person.java`. Długie nazwy zawijają się do szerokości kolumny. Podpis pozostaje poza blokiem kodu, a kolorowanie składni określa język po otwierających trzech znakach backtick.
+
+### Obraz — podpis nad ilustracją
+
+```markdown
+<figure class="image-example" markdown="1">
+<figcaption>Rysunek 1. Układ okna aplikacji</figcaption>
+
+![Okno z menu po lewej i panelem treści po prawej](/assets/images/okno.png)
+
+</figure>
+```
+
+Zastąp adres obrazu własnym. Gdy strona ma ustawione `baseurl`, zastosuj filtr Jekylla `relative_url`, tak jak w demonstracji `index.md`. Tekst alternatywny w `![...]` opisuje zawartość obrazu; podpis może podawać jego tytuł, numer lub źródło.
+
+### Tabela — podpis pod tabelą
+
+```markdown
+<figure class="table-example" markdown="1">
+
+| Pole | Typ |
+| --- | --- |
+| name | String |
+| age | int |
+
+<figcaption>Tabela 1. Pola klasy Person</figcaption>
+</figure>
+```
+
+W tym wariancie `figcaption` umieść **po tabeli**. Motyw obsługuje również natywny element HTML `caption` wewnątrz `table` i wyświetla go na dole. Wybierz jeden rodzaj podpisu dla danej tabeli.
+
+Wszystkie podpisy dopasowują kolory do jasnego i ciemnego motywu. W tekście podpisów zapisanych jako HTML zamieniaj `&` na `&amp;` i `<` na `&lt;`.
+
 ## Podgląd lokalny
 
 Po zainstalowaniu Ruby i Bundlera można uruchomić demonstrację lokalnie:
