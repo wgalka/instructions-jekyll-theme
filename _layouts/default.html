@@ -5,10 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% seo %}
-    <link rel="icon" href="{{ '/assets/images/favicon.ico' | relative_url }}" sizes="any">
-    <link rel="icon" href="{{ '/assets/images/LS.svg' | relative_url }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ '/assets/images/apple-touch-icon.png' | relative_url }}">
-    <link rel="manifest" href="{{ '/site.webmanifest' | relative_url }}">
+    <link rel="icon" href="{{ site.favicon_ico | default: '/assets/images/favicon.ico' | relative_url }}" sizes="any">
+    <link rel="icon" href="{{ site.favicon_svg | default: '/assets/images/favicon.svg' | relative_url }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ site.apple_touch_icon | default: '/assets/images/apple-touch-icon.png' | relative_url }}">
+    <link rel="manifest" href="{{ site.webmanifest | default: '/site.webmanifest' | relative_url }}">
     <script src="{{ '/assets/js/theme-toggle.js?v=4' | relative_url }}"></script>
     <link rel="stylesheet" href="{{ "/assets/css/style.css?v=14" | relative_url }}">
     {% include head-custom.html %}
