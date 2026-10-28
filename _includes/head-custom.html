@@ -593,6 +593,17 @@
         });
     }
 
+    function prepareFigureCaptions() {
+      document
+        .querySelectorAll(".markdown-body figure.image-example, .markdown-body figure.table-example")
+        .forEach(function (figure) {
+          const caption = figure.querySelector(":scope > figcaption");
+          if (caption && caption !== figure.lastElementChild) {
+            figure.appendChild(caption);
+          }
+        });
+    }
+
     function prepareResponsiveTables() {
       function isWrapperExpanded(wrapper) {
         if (wrapper.dataset.tableState) {
@@ -862,6 +873,7 @@
     prepareMermaidBlocks();
     prepareMathBlocks();
     prepareResponsiveTables();
+    prepareFigureCaptions();
     prepareCodeBlocks();
 
     if (typeof window.applyPolishTypography === "function") {

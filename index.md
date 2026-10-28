@@ -26,13 +26,13 @@ Po laboratorium powinieneś:
 ### Zachowanie ciągłości projektu
 
 <figure class="table-example" markdown="1">
-<figcaption>Tabela 1. Powiązanie z wcześniejszymi zajęciami</figcaption>
 
 | Etap wcześniejszy | Rozwinięcie w tym laboratorium |
 | --- | --- |
 | Dotychczasowe wymaganie | Co należy zachować |
 | Istniejący kod i testy | Co należy rozwinąć |
 
+<figcaption>Tabela 1. Powiązanie z wcześniejszymi zajęciami</figcaption>
 </figure>
 
 ## 2. Organizacja pracy
@@ -66,10 +66,10 @@ public class Person {
 ### Ilustracja z podpisem
 
 <figure class="image-example" markdown="1">
-<figcaption>Rysunek 1. Przykładowy układ okna aplikacji</figcaption>
 
 ![Okno aplikacji z paskiem tytułu, menu po lewej i panelem treści po prawej]({{ '/assets/images/example-layout.svg' | relative_url }})
 
+<figcaption>Rysunek 1. Przykładowy układ okna aplikacji</figcaption>
 </figure>
 
 ### Przykładowy wzór matematyczny

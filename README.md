@@ -44,34 +44,36 @@ public class Person {
 
 Możesz podać też ścieżkę, np. `src/main/java/Person.java`. Długie nazwy zawijają się do szerokości kolumny. Podpis pozostaje poza blokiem kodu, a kolorowanie składni określa język po otwierających trzech znakach backtick.
 
-### Obraz — podpis nad ilustracją
+### Obraz — podpis pod ilustracją
 
 ```markdown
 <figure class="image-example" markdown="1">
-<figcaption>Rysunek 1. Układ okna aplikacji</figcaption>
 
 ![Okno z menu po lewej i panelem treści po prawej](/assets/images/okno.png)
 
+<figcaption>Rysunek 1. Układ okna aplikacji</figcaption>
 </figure>
 ```
 
 Zastąp adres obrazu własnym. Gdy strona ma ustawione `baseurl`, zastosuj filtr Jekylla `relative_url`, tak jak w demonstracji `index.md`. Tekst alternatywny w `![...]` opisuje zawartość obrazu; podpis może podawać jego tytuł, numer lub źródło.
 
-### Tabela — podpis nad tabelą
+### Tabela — podpis pod tabelą
 
 ```markdown
 <figure class="table-example" markdown="1">
-<figcaption>Tabela 1. Pola klasy Person</figcaption>
 
 | Pole | Typ |
 | --- | --- |
 | name | String |
 | age | int |
 
+<figcaption>Tabela 1. Pola klasy Person</figcaption>
 </figure>
 ```
 
-W tym wariancie `figcaption` umieść **przed tabelą**. Motyw obsługuje również natywny element HTML `caption` wewnątrz `table` i wyświetla go nad tabelą. Wybierz jeden rodzaj podpisu dla danej tabeli.
+Podpisy tabel i ilustracji są wycentrowane, zapisane kursywą, bez obramowania i tła. Numer oraz opis wpisz w treści `figcaption`, np. `Tabela 1. Pola klasy Person` lub `Rysunek 1. Układ okna aplikacji`.
+
+Element `figcaption` umieść **po tabeli lub obrazie**. Dla starszych fragmentów z podpisem u góry motyw przenosi go na koniec `figure` po załadowaniu strony. Motyw obsługuje również natywny element HTML `caption` wewnątrz `table` i wyświetla go pod tabelą. Wybierz jeden rodzaj podpisu dla danej tabeli.
 
 Wszystkie podpisy dopasowują kolory do jasnego i ciemnego motywu. W tekście podpisów zapisanych jako HTML zamieniaj `&` na `&amp;` i `<` na `&lt;`.
 

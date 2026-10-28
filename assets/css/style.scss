@@ -362,8 +362,7 @@ body {
 }
 
 .markdown-body .code-caption,
-.markdown-body .code-example > figcaption,
-.markdown-body .image-example > figcaption {
+.markdown-body .code-example > figcaption {
   border-bottom: 0;
   border-radius: 6px 6px 0 0;
   break-after: avoid;
@@ -377,7 +376,8 @@ body {
 
 .markdown-body .code-example > figcaption > p,
 .markdown-body .image-example > figcaption > p,
-.markdown-body .table-example > figcaption > p {
+.markdown-body .table-example > figcaption > p,
+.markdown-body table > caption > p {
   margin: 0;
   text-align: inherit;
   hyphens: inherit;
@@ -416,18 +416,23 @@ body {
 
 .markdown-body .image-example img {
   margin: 0;
-  border: 1px solid var(--theme-border);
-  border-radius: 0 0 6px 6px;
+  border: 0;
+  border-radius: 6px;
 }
 
+.markdown-body .image-example > figcaption,
 .markdown-body .table-example > figcaption,
 .markdown-body table > caption {
-  caption-side: top;
-  border-bottom: 0;
-  border-radius: 6px 6px 0 0;
+  caption-side: bottom;
+  padding: 0.5rem 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--theme-muted);
+  text-align: center;
+  font-style: italic;
   font-weight: 400;
-  break-after: avoid;
+  break-before: avoid;
 }
 
 .markdown-body pre > code[data-wrapped-lines="true"] {
