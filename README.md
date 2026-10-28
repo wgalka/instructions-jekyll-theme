@@ -34,4 +34,6 @@ bundle exec jekyll serve
 
 ## Licencja i pochodzenie
 
-Układ HTML został oparty na pliku `_layouts/default.html` z `pages-themes/primer` w wersji `v0.6.0`. Primer jest udostępniany na licencji MIT; zachowaj informację o licencji przy dalszym rozpowszechnianiu motywu.
+Motyw zawiera zmodyfikowany układ HTML z [Primer v0.6.0](https://github.com/pages-themes/primer/tree/v0.6.0) i korzysta z jego stylów. Oryginalne elementy Primer są udostępniane na licencji MIT: **Copyright (c) 2016-2017 GitHub, Inc.**
+
+Pełny, niezmieniony tekst licencji wraz z informacją copyright znajduje się w [`_includes/licenses/primer-MIT.txt`](_includes/licenses/primer-MIT.txt). Motyw dołącza go również do komentarzy w generowanym HTML i CSS. Przy dalszym rozpowszechnianiu kopii lub istotnych części kodu Primer należy zachować informację copyright i tekst licencji. Pochodzenie wykorzystanych elementów opisano w [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).

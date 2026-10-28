@@ -1,6 +1,13 @@
 ---
 ---
 
+/*!
+ * Includes styles from pages-themes/primer v0.6.0:
+ * https://github.com/pages-themes/primer/tree/v0.6.0
+ *
+{% include licenses/primer-MIT.txt %}
+ */
+
 @import "jekyll-theme-primer";
 
 .markdown-body > p,
@@ -753,6 +760,17 @@ body {
 :root[data-theme="dark"] .markdown-body kbd {
   border-color: var(--theme-border);
   box-shadow: inset 0 -1px 0 var(--theme-border);
+}
+
+// Override Primer's light colors for punctuation, operators and plain names.
+:root[data-theme="dark"] .markdown-body .highlight .p,
+:root[data-theme="dark"] .markdown-body .highlight .pi,
+:root[data-theme="dark"] .markdown-body .highlight .o,
+:root[data-theme="dark"] .markdown-body .highlight .ow,
+:root[data-theme="dark"] .markdown-body .highlight .n,
+:root[data-theme="dark"] .markdown-body .highlight .nx,
+:root[data-theme="dark"] .markdown-body .highlight .nn {
+  color: var(--theme-text);
 }
 
 :root[data-theme="dark"] .markdown-body .highlight .c,
