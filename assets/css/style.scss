@@ -422,12 +422,12 @@ body {
 
 .markdown-body .table-example > figcaption,
 .markdown-body table > caption {
-  caption-side: bottom;
-  border-top: 0;
-  border-radius: 0 0 6px 6px;
+  caption-side: top;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
   color: var(--theme-muted);
   font-weight: 400;
-  break-before: avoid;
+  break-after: avoid;
 }
 
 .markdown-body pre > code[data-wrapped-lines="true"] {

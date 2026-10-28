@@ -57,21 +57,21 @@ Możesz podać też ścieżkę, np. `src/main/java/Person.java`. Długie nazwy z
 
 Zastąp adres obrazu własnym. Gdy strona ma ustawione `baseurl`, zastosuj filtr Jekylla `relative_url`, tak jak w demonstracji `index.md`. Tekst alternatywny w `![...]` opisuje zawartość obrazu; podpis może podawać jego tytuł, numer lub źródło.
 
-### Tabela — podpis pod tabelą
+### Tabela — podpis nad tabelą
 
 ```markdown
 <figure class="table-example" markdown="1">
+<figcaption>Tabela 1. Pola klasy Person</figcaption>
 
 | Pole | Typ |
 | --- | --- |
 | name | String |
 | age | int |
 
-<figcaption>Tabela 1. Pola klasy Person</figcaption>
 </figure>
 ```
 
-W tym wariancie `figcaption` umieść **po tabeli**. Motyw obsługuje również natywny element HTML `caption` wewnątrz `table` i wyświetla go na dole. Wybierz jeden rodzaj podpisu dla danej tabeli.
+W tym wariancie `figcaption` umieść **przed tabelą**. Motyw obsługuje również natywny element HTML `caption` wewnątrz `table` i wyświetla go nad tabelą. Wybierz jeden rodzaj podpisu dla danej tabeli.
 
 Wszystkie podpisy dopasowują kolory do jasnego i ciemnego motywu. W tekście podpisów zapisanych jako HTML zamieniaj `&` na `&amp;` i `<` na `&lt;`.
 

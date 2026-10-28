@@ -26,13 +26,13 @@ Po laboratorium powinieneś:
 ### Zachowanie ciągłości projektu
 
 <figure class="table-example" markdown="1">
+<figcaption>Tabela 1. Powiązanie z wcześniejszymi zajęciami</figcaption>
 
 | Etap wcześniejszy | Rozwinięcie w tym laboratorium |
 | --- | --- |
 | Dotychczasowe wymaganie | Co należy zachować |
 | Istniejący kod i testy | Co należy rozwinąć |
 
-<figcaption>Tabela 1. Powiązanie z wcześniejszymi zajęciami</figcaption>
 </figure>
 
 ## 2. Organizacja pracy
