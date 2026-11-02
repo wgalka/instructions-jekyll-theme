@@ -224,6 +224,18 @@ body {
   border-radius: 6px;
 }
 
+// Usuwanie białego tła pod grafikami wektorowymi SVG oraz obrazami w trybie ciemnym (nadpisanie domyślnego background-color: #fff z motywu Primer)
+[data-theme="dark"] img[src$=".svg"],
+html.dark img[src$=".svg"],
+img[src$=".svg"],
+.markdown-body img[src*=".svg"] {
+  background-color: transparent !important;
+}
+
+:root[data-theme="dark"] .markdown-body img {
+  background-color: transparent !important;
+}
+
 .markdown-body figure {
   width: 100%;
   max-width: 100%;
