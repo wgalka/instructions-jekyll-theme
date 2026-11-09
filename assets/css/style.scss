@@ -559,6 +559,133 @@ img[src$=".svg"],
   user-select: none;
 }
 
+.page-toc {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 900;
+  width: 16rem;
+  max-height: calc(100vh - 2rem);
+  flex-direction: column;
+  color: var(--theme-text);
+  background: var(--theme-surface-raised);
+  border: 1px solid var(--theme-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(31, 35, 40, 0.08);
+  box-sizing: border-box;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.page-toc__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.85rem;
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  color: var(--theme-text);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.page-toc__toggle svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.page-toc__action {
+  margin-left: auto;
+  color: var(--theme-muted);
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+
+.page-toc__nav {
+  min-height: 0;
+  padding: 0.4rem 0.6rem 0.75rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-border) transparent;
+  border-top: 1px solid var(--theme-border);
+}
+
+.page-toc__nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page-toc__nav a {
+  display: block;
+  margin-top: 0.15rem;
+  padding: 0.4rem 0.5rem 0.4rem calc(0.6rem + var(--toc-depth, 0) * 0.65rem);
+  border-left: 2px solid transparent;
+  border-radius: 0 6px 6px 0;
+  color: var(--theme-muted);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.page-toc__toggle:hover,
+.page-toc__nav a:hover,
+.page-toc__nav a[aria-current="location"] {
+  color: var(--theme-link);
+  background: var(--theme-surface);
+}
+
+.page-toc__nav a[aria-current="location"] {
+  border-left-color: var(--theme-link);
+  font-weight: 600;
+}
+
+.page-toc__toggle:focus-visible,
+.page-toc__nav a:focus-visible {
+  outline: 2px solid var(--theme-link);
+  outline-offset: -3px;
+}
+
+#page-content :is(h1, h2, h3, h4, h5, h6)[id] {
+  scroll-margin-top: 1.5rem;
+}
+
+@media screen and (min-width: 1100px) {
+  .page-toc:not([hidden]) {
+    display: flex;
+  }
+
+  .page-toc.is-collapsed {
+    width: 14rem;
+  }
+
+  :root.has-page-toc body {
+    padding-left: 18rem;
+  }
+
+  :root.has-page-toc .markdown-body .table-wrapper.is-expanded {
+    max-width: calc(100vw - 21rem);
+  }
+}
+
+@media print {
+  .page-toc {
+    display: none !important;
+  }
+}
+
 .reading-controls {
   position: fixed;
   z-index: 1000;

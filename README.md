@@ -23,6 +23,22 @@ GitHub Pages obsługuje `remote_theme` z repozytorium GitHub; plugin `jekyll-rem
 
 `_layouts/default.html` zachowuje układ Primer, `assets/css/style.scss` importuje jego oryginalne style i justuje akapity z automatycznym dzieleniem wyrazów. Fragmenty kodu nie są dzielone. Skrypt `assets/js/polish-typography.js` łączy twardą spacją częste krótkie polskie wyrazy (np. `a`, `i`, `w`, `z`, `do`, `na`, `po`, `że`) z następnym wyrazem, również gdy jest on zapisany jako kod inline lub wzór matematyczny, pomijając zawartość bloków kodu, diagramów i równań. Panel w prawym górnym rogu pozwala przełączać motyw jasny/ciemny oraz maksymalną szerokość linii tekstu (`45`, `55`, `65`, `80` lub `100` znaków, domyślnie `55`), dopasowując jednocześnie szerokość zdjęć, bloków kodu, tabel, diagramów i wzorów; oba ustawienia są zapamiętywane w `localStorage`. `_includes/head-custom.html` odpowiada za renderowanie diagramów `mermaid` oraz równań matematycznych `MathJax` (`$...$`, `$$...$$`, `\(...\)`, `\[...\]` i bloków `math`/`latex`) z zabezpieczeniem przed utratą lub uszkodzeniem elementów podczas przełączania motywu jasny/ciemny i zmiany szerokości kolumny. `index.md` służy jako demonstracyjna instrukcja i wzór treści.
 
+## Boczny spis treści
+
+Zakres poziomów nagłówków ustaw w `_config.yml`. Na przykład, aby uwzględniać tylko `h2` i `h3` (Markdown `##` i `###`):
+
+```yml
+toc:
+  min_level: 2
+  max_level: 3
+```
+
+Domyślny zakres to `1`–`6`. Aby zbierać tylko jeden poziom, ustaw obie wartości na tę samą liczbę. Wartości muszą być liczbami całkowitymi od `1` do `6`; nieprawidłowa wartość przyjmuje domyślny poziom, a odwrócony zakres przywraca `1`–`6`. Przy użyciu `remote_theme` dodaj te ustawienia w konfiguracji witryny korzystającej z motywu. Po zmianie konfiguracji uruchom ponownie lokalny serwer Jekylla lub przebuduj stronę.
+
+Na komputerach (okno o szerokości co najmniej 1100 px) motyw automatycznie wyświetla po lewej stronie spis treści z nagłówków `h1`–`h6`. Poziomy nagłówków mają wcięcia, a aktualnie czytana sekcja jest wyróżniona. Kliknięcie pozycji przenosi do nagłówka i otwiera otaczające go zwinięte bloki `details`.
+
+Przycisk „Ukryj” zwija panel do przycisku „Spis treści · Pokaż”; wybór jest zapamiętywany w `localStorage`. Otwarty panel ma własne przewijanie i pozostawia miejsce na kolumnę tekstu, także po zmianie jej szerokości w ustawieniach. Kolory korzystają z aktywnego motywu jasnego lub ciemnego. Na mniejszych ekranach oraz na wydruku panel jest niewidoczny. Strony bez nagłówków nie pokazują panelu. Atrybut `data-toc-ignore` na nagłówku lub jego kontenerze pozwala wykluczyć go ze spisu.
+
 ## Podpisy kodu, obrazów i tabel
 
 Element `figure` grupuje treść z jej podpisem `figcaption`. Atrybut `markdown="1"` pozwala używać zwykłego Markdown wewnątrz. Zachowuj puste linie oddzielające podpis, kod, obraz lub tabelę, tak jak w przykładach.

@@ -2,6 +2,11 @@ title: PAWOoM
 description: Instrukcje laboratoryjne
 lang: pl-PL
 
+# Poziomy nagłówków w bocznym spisie treści (1 = h1, 6 = h6).
+toc:
+  min_level: 1
+  max_level: 6
+
 remote_theme: pages-themes/primer@v0.6.0
 
 plugins:

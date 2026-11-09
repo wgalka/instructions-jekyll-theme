@@ -12,7 +12,7 @@
     <link rel="manifest" href="{{ site.webmanifest | relative_url }}">
     {% endif %}
     <script src="{{ '/assets/js/theme-toggle.js?v=4' | relative_url }}"></script>
-    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=15" | relative_url }}">
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=16" | relative_url }}">
     {% include head-custom.html %}
   </head>
   <body>
@@ -72,9 +72,17 @@
         </button>
       </div>
     </div>
-    <div class="container-lg px-3 my-5 markdown-body">
+    <aside class="page-toc" id="page-toc" aria-label="Spis treści" data-min-level="{{ site.toc.min_level | default: 1 | escape }}" data-max-level="{{ site.toc.max_level | default: 6 | escape }}" hidden>
+      <button class="page-toc__toggle" id="page-toc-toggle" type="button" aria-expanded="true" aria-controls="page-toc-nav">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6h12M9 12h12M9 18h12M3 6h1M3 12h1M3 18h1"></path></svg>
+        <span>Spis treści</span>
+        <span class="page-toc__action">Ukryj</span>
+      </button>
+      <nav class="page-toc__nav" id="page-toc-nav" aria-label="Nagłówki na tej stronie"></nav>
+    </aside>
+    <div class="container-lg px-3 my-5 markdown-body" id="page-content">
       {% if site.title and site.title != page.title %}
-      <h1><a href="{{ "/" | absolute_url }}">{{ site.title }}</a></h1>
+      <h1 data-toc-ignore><a href="{{ "/" | absolute_url }}">{{ site.title }}</a></h1>
       {% endif %}
 
       {{ content }}
@@ -86,6 +94,7 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
     <script>anchors.add();</script>
+    <script src="{{ '/assets/js/table-of-contents.js?v=2' | relative_url }}" defer></script>
   </body>
 <!--
 Layout adapted from pages-themes/primer v0.6.0:
