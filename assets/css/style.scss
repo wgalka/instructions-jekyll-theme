@@ -204,8 +204,9 @@ body {
 }
 
 .container-lg.markdown-body {
+  --content-width: calc(var(--reading-measure, 55ch) + 2rem);
   width: 100%;
-  max-width: calc(var(--reading-measure, 55ch) + 2rem);
+  max-width: var(--content-width);
   box-sizing: border-box;
   color: var(--theme-text);
   transition: max-width 160ms ease;
@@ -656,12 +657,13 @@ img[src$=".svg"],
     width: 14rem;
   }
 
-  :root.has-page-toc body {
-    padding-left: 18rem;
+  :root.has-page-toc #page-content {
+    max-width: calc(min(var(--content-width), 100% - 19rem));
+    margin-left: calc(max(18rem, (100% - var(--content-width)) / 2));
   }
 
   :root.has-page-toc .markdown-body .table-wrapper.is-expanded {
-    max-width: calc(100vw - 21rem);
+    max-width: calc(100vw - 36rem);
   }
 }
 
