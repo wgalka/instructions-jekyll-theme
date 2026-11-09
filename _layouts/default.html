@@ -12,7 +12,7 @@
     <link rel="manifest" href="{{ site.webmanifest | relative_url }}">
     {% endif %}
     <script src="{{ '/assets/js/theme-toggle.js?v=4' | relative_url }}"></script>
-    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=16" | relative_url }}">
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=17" | relative_url }}">
     {% include head-custom.html %}
   </head>
   <body>
@@ -74,7 +74,6 @@
     </div>
     <aside class="page-toc" id="page-toc" aria-label="Spis treści" data-min-level="{{ site.toc.min_level | default: 1 | escape }}" data-max-level="{{ site.toc.max_level | default: 6 | escape }}" hidden>
       <button class="page-toc__toggle" id="page-toc-toggle" type="button" aria-expanded="true" aria-controls="page-toc-nav">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6h12M9 12h12M9 18h12M3 6h1M3 12h1M3 18h1"></path></svg>
         <span>Spis treści</span>
         <span class="page-toc__action">Ukryj</span>
       </button>

@@ -569,10 +569,6 @@ img[src$=".svg"],
   max-height: calc(100vh - 2rem);
   flex-direction: column;
   color: var(--theme-text);
-  background: var(--theme-surface-raised);
-  border: 1px solid var(--theme-border);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(31, 35, 40, 0.08);
   box-sizing: border-box;
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -585,7 +581,7 @@ img[src$=".svg"],
   align-items: center;
   gap: 0.6rem;
   width: 100%;
-  padding: 0.85rem;
+  padding: 0.5rem 0.65rem;
   flex-shrink: 0;
   border: 0;
   background: transparent;
@@ -594,16 +590,6 @@ img[src$=".svg"],
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-}
-
-.page-toc__toggle svg {
-  width: 1.15rem;
-  height: 1.15rem;
-  flex-shrink: 0;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
 }
 
 .page-toc__action {
@@ -615,12 +601,11 @@ img[src$=".svg"],
 
 .page-toc__nav {
   min-height: 0;
-  padding: 0.4rem 0.6rem 0.75rem;
+  padding: 0 0.15rem 0.5rem;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: var(--theme-border) transparent;
-  border-top: 1px solid var(--theme-border);
 }
 
 .page-toc__nav ul {
@@ -631,10 +616,7 @@ img[src$=".svg"],
 
 .page-toc__nav a {
   display: block;
-  margin-top: 0.15rem;
-  padding: 0.4rem 0.5rem 0.4rem calc(0.6rem + var(--toc-depth, 0) * 0.65rem);
-  border-left: 2px solid transparent;
-  border-radius: 0 6px 6px 0;
+  padding: 0.25rem 0.5rem 0.25rem calc(0.5rem + var(--toc-depth, 0) * 0.65rem);
   color: var(--theme-muted);
   text-decoration: none;
   overflow-wrap: anywhere;
@@ -644,11 +626,14 @@ img[src$=".svg"],
 .page-toc__nav a:hover,
 .page-toc__nav a[aria-current="location"] {
   color: var(--theme-link);
-  background: var(--theme-surface);
+}
+
+.page-toc__toggle:hover .page-toc__action,
+.page-toc__nav a:hover {
+  text-decoration: underline;
 }
 
 .page-toc__nav a[aria-current="location"] {
-  border-left-color: var(--theme-link);
   font-weight: 600;
 }
 
